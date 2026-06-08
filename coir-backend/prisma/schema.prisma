@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserType {
+  INDIVIDUAL
+  BUSINESS
+  ADMIN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  mobile   String  @unique
+  email    String? @unique
+  password String?
+
+  otpHash      String?
+  otpExpiresAt DateTime?
+  refreshTokenHash String?
+
+  userType UserType
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile?
+
+  applications Application[]
+}
+
+model Profile {
+  id Int @id @default(autoincrement())
+
+  userId Int @unique
+
+  fullName String
+
+  dob DateTime?
+
+  gender String?
+
+  photo String?
+
+  address    String?
+  city       String?
+  district   String?
+  state      String?
+  country    String?
+  postalCode String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Scheme {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  description String?
+
+  duration String?
+
+  stipend Decimal? @db.Decimal(10, 2)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications Application[]
+}
+
+model TrainingCentre {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  district String?
+
+  state String?
+
+  address String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications Application[]
+}
+
+model Application {
+  id Int @id @default(autoincrement())
+
+  applicationNo String @unique
+
+  userId Int
+
+  schemeId Int
+
+  trainingCentreId Int?
+
+  status ApplicationStatus @default(DRAFT)
+
+  submittedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  scheme Scheme @relation(fields: [schemeId], references: [id])
+
+  trainingCentre TrainingCentre? @relation(fields: [trainingCentreId], references: [id])
+
+  detail ApplicationDetail?
+
+  logs ApplicationLog[]
+}
+
+model ApplicationDetail {
+  id Int @id @default(autoincrement())
+
+  applicationId Int @unique
+
+  personalDetails Json?
+
+  experienceDetails Json?
+
+  bankDetails Json?
+
+  documents Json?
+
+  declarationAccepted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+//future approval tracking ke liye
+
+model ApplicationLog {
+  id Int @id @default(autoincrement())
+
+  applicationId Int
+
+  action String
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id])
+}
