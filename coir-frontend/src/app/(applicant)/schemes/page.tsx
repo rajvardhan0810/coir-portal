@@ -1,6 +1,6 @@
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import { Header } from "@/components/dashboard/Header";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { DashboardCard } from "@/components/applicant/cards/DashboardCard";
+import { Header } from "@/components/applicant/layout/Header";
+import { Sidebar } from "@/components/applicant/layout/Sidebar";
 
 export default function SchemesPage() {
   return (
