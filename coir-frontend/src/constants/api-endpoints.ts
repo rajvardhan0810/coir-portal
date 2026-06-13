@@ -8,4 +8,23 @@ export const API_ENDPOINTS = {
     refresh: "/auth/refresh",
     logout: "/auth/logout",
   },
+
+  applications: {
+    create: "/applications",
+
+    my: "/applications/my",
+
+    details: (id: number) =>
+      `/applications/${id}/details`,
+
+    byId: (id: number) =>
+      `/applications/${id}`,
+
+    submit: (id: number) =>
+      `/applications/${id}/submit`,
+  },
+
+  upload: {
+    file: "/upload",
+  },
 } as const;

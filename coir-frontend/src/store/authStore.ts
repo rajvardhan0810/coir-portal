@@ -42,6 +42,21 @@ export function saveAuthSession(
   refreshToken: string,
   user: AuthUser,
 ) {
+  saveAuthTokens(
+    accessToken,
+    refreshToken,
+  );
+
+  localStorage.setItem(
+    USER_KEY,
+    JSON.stringify(user),
+  );
+}
+
+export function saveAuthTokens(
+  accessToken: string,
+  refreshToken: string,
+) {
   localStorage.setItem(
     ACCESS_TOKEN_KEY,
     accessToken,
@@ -50,11 +65,6 @@ export function saveAuthSession(
   localStorage.setItem(
     REFRESH_TOKEN_KEY,
     refreshToken,
-  );
-
-  localStorage.setItem(
-    USER_KEY,
-    JSON.stringify(user),
   );
 }
 

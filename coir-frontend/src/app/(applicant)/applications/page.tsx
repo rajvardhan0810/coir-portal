@@ -1,6 +1,6 @@
-import { DashboardCard } from "@/components/applicant/cards/DashboardCard";
-import { Header } from "@/components/applicant/layout/Header";
-import { Sidebar } from "@/components/applicant/layout/Sidebar";
+import { DashboardCard } from "@/components/applicant/dashboards/cards/DashboardCard";
+import { Header } from "@/components/applicant/dashboards/layout/Header";
+import { Sidebar } from "@/components/applicant/dashboards/layout/Sidebar";
 
 export default function ApplicationsPage() {
   return (

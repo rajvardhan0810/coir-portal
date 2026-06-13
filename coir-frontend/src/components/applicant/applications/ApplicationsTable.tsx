@@ -1,6 +1,43 @@
-import { dashboardApplications } from "../data/dashboard-demo-data";
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { getMyApplications } from "@/services/application.service";
+
+type Application = {
+  id: number;
+  applicationNo: string;
+  status: string;
+  createdAt: string;
+
+  scheme: {
+    name: string;
+  };
+
+  course: {
+    title: string;
+  };
+};
 
 export function ApplicationsTable() {
+  const [applications, setApplications] =
+    useState<Application[]>([]);
+
+  useEffect(() => {
+    async function loadApplications() {
+      try {
+        const data =
+          await getMyApplications();
+
+        setApplications(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadApplications();
+  }, []);
+
   return (
     <section className="applications-section">
       <div className="applications-section__header">
@@ -27,31 +64,33 @@ export function ApplicationsTable() {
           </thead>
 
           <tbody>
-            {dashboardApplications.map(
+            {applications.map(
               (application) => (
-                <tr key={application.id}>
-                  <td>{application.id}</td>
-
+                <tr
+                  key={application.id}
+                >
                   <td>
                     {
-                      application.schemeName
+                      application.applicationNo
                     }
                   </td>
 
                   <td>
                     {
-                      application.appliedDate
+                      application.scheme
+                        .name
                     }
+                  </td>
+
+                  <td>
+                    {new Date(
+                      application.createdAt,
+                    ).toLocaleDateString()}
                   </td>
 
                   <td>
                     <span
-                      className={`application-status application-status--${application.status
-                        .toLowerCase()
-                        .replace(
-                          /\s+/g,
-                          "-",
-                        )}`}
+                      className={`application-status application-status--${application.status.toLowerCase()}`}
                     >
                       {
                         application.status

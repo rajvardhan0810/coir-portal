@@ -1,15 +1,44 @@
-import { DashboardLayout } from "@/components/applicant/layout/DashboardLayout";
+"use client";
 
-import { WelcomeSection } from "@/components/applicant/sections/WelcomeSection";
-import { AlertsSection } from "@/components/applicant/sections/AlertsSection";
-import { StatsSection } from "@/components/applicant/sections/StatsSection";
-import { ApplicationsSection } from "@/components/applicant/sections/ApplicationsSection";
+import { useEffect, useState } from "react";
+
+import { DashboardLayout } from "@/components/applicant/dashboards/layout/DashboardLayout";
+
+import { WelcomeSection } from "@/components/applicant/dashboards/sections/WelcomeSection";
+import { AlertsSection } from "@/components/applicant/dashboards/sections/AlertsSection";
+import { StatsSection } from "@/components/applicant/dashboards/sections/StatsSection";
+import { ApplicationsSection } from "@/components/applicant/dashboards/sections/ApplicationsSection";
+
+import { getCurrentUser } from "@/services/auth.service";
+import { getAuthUser } from "@/store/authStore";
 
 export default function DashboardPage() {
-  const userName = "Applicant";
+  const [userName, setUserName] =
+    useState(() =>
+      getAuthUser()?.fullName ??
+      "Applicant",
+    );
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const user =
+          await getCurrentUser();
+
+        setUserName(
+          user.fullName ??
+            "Applicant",
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    void loadUser();
+  }, []);
 
   return (
-    <DashboardLayout userName={userName}>
+    <DashboardLayout>
       <WelcomeSection userName={userName} />
 
       <AlertsSection />

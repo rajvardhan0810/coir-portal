@@ -26,8 +26,8 @@ model User {
   email    String? @unique
   password String?
 
-  otpHash      String?
-  otpExpiresAt DateTime?
+  otpHash          String?
+  otpExpiresAt     DateTime?
   refreshTokenHash String?
 
   userType UserType
@@ -71,13 +71,15 @@ model Profile {
 model Scheme {
   id Int @id @default(autoincrement())
 
+  code String @unique
+
   name String
 
   description String?
 
   duration String?
 
-  stipend Decimal? @db.Decimal(10, 2)
+  stipend Decimal? @db.Decimal(10,2)
 
   isActive Boolean @default(true)
 
@@ -85,7 +87,9 @@ model Scheme {
   updatedAt DateTime @updatedAt
 
   applications Application[]
+  courses Course[]
 }
+
 
 model TrainingCentre {
   id Int @id @default(autoincrement())
@@ -106,6 +110,31 @@ model TrainingCentre {
   applications Application[]
 }
 
+model Course {
+  id Int @id @default(autoincrement())
+
+  schemeId Int
+
+  title String
+
+  category String?
+
+  duration String?
+
+  benefit String?
+
+  level String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scheme Scheme @relation(fields: [schemeId], references: [id])
+
+  applications Application[]
+}
+
 model Application {
   id Int @id @default(autoincrement())
 
@@ -115,10 +144,14 @@ model Application {
 
   schemeId Int
 
+  courseId Int
+
   trainingCentreId Int?
 
   status ApplicationStatus @default(DRAFT)
 
+  currentStep Int @default(1)
+  
   submittedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -127,6 +160,8 @@ model Application {
   user User @relation(fields: [userId], references: [id])
 
   scheme Scheme @relation(fields: [schemeId], references: [id])
+
+  course Course @relation(fields: [courseId], references: [id])
 
   trainingCentre TrainingCentre? @relation(fields: [trainingCentreId], references: [id])
 
@@ -147,6 +182,8 @@ model ApplicationDetail {
   bankDetails Json?
 
   documents Json?
+
+  declarationAcceptedAt DateTime?
 
   declarationAccepted Boolean @default(false)
 
