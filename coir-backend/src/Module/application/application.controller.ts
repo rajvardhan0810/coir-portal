@@ -29,13 +29,13 @@ export class ApplicationController {
     @Body()
     body: {
       schemeId: number;
-      courseId: number;
+      programId: number;
     },
   ) {
     return this.applicationService.createDraft(
       req.user.userId,
       body.schemeId,
-      body.courseId,
+      body.programId,
     );
   }
 
@@ -81,5 +81,45 @@ export class ApplicationController {
     );
   }
 
+  @Get()
+  async findAll() {
+    return this.applicationService.findAll();
+  }
 
+  @Post('bulk-approve')
+  async bulkApprove(
+    @Body('ids') ids: number[],
+  ) {
+    return this.applicationService.bulkApprove(ids);
+  }
+
+  @Post('final-approve')
+  async finalApprove(
+    @Body('remarks') remarks?: string,
+  ) {
+    return this.applicationService.bulkFinalApprove(remarks);
+  }
+
+  @Post(':id/approve')
+  async approve(
+    @Param('id') id: string,
+  ) {
+    return this.applicationService.approve(Number(id));
+  }
+
+  @Post(':id/clarification')
+  async seekClarification(
+    @Param('id') id: string,
+    @Body('remarks') remarks?: string,
+  ) {
+    return this.applicationService.seekClarification(Number(id), remarks);
+  }
+
+  @Post(':id/review')
+  async sendToReview(
+    @Param('id') id: string,
+    @Body('remarks') remarks?: string,
+  ) {
+    return this.applicationService.sendToReview(Number(id), remarks);
+  }
 }

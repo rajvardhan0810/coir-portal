@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { useRouter } from "next/navigation";
 
 import { ROUTES } from "@/constants/routes";
@@ -20,12 +25,19 @@ export function Header({
 }: HeaderProps) {
   const router = useRouter();
 
-  const authUser = getAuthUser();
+  const [displayName, setDisplayName] =
+    useState("Applicant");
 
-  const displayName =
-    userName ??
-    authUser?.fullName ??
-    "Applicant";
+  useEffect(() => {
+    const authUser =
+      getAuthUser();
+
+    setDisplayName(
+      userName ??
+        authUser?.fullName ??
+        "Applicant",
+    );
+  }, [userName]);
 
   async function logout() {
     try {

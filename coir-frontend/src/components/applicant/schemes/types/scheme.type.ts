@@ -1,8 +1,9 @@
 export type Scheme = {
-  id: string;
+  id: number;
   code: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
+  name: string;
+  description: string | null;
+  duration?: string | null;
+  stipend?: string | null;
+  isActive?: boolean;
 };

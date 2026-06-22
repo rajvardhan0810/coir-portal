@@ -1,18 +1,100 @@
-import { courses } from "../data/courses-data";
-import { CourseCard } from "../cards/CourseCard";
+"use client";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { ProgramsCard } from "../cards/ProgramsCard";
+import type { Program } from "../types/programs.type";
+import type { Scheme } from "../../types/scheme.type";
+
+import {
+  getProgramsByScheme,
+  getSchemes,
+} from "@/services/scheme.service";
 
 type Props = {
-  schemeId: string;
-  schemeTitle: string;
+  schemeCode: string;
 };
 
-export function CoursesSection({
-  schemeId,
-  schemeTitle,
+export function ProgramsSection({
+  schemeCode,
 }: Props) {
-  const filteredCourses = courses.filter(
-    (course) => course.schemeId === schemeId,
-  );
+  const [scheme, setScheme] =
+    useState<Scheme | null>(null);
+
+  const [programs, setPrograms] =
+    useState<Program[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    async function loadPrograms() {
+      try {
+        setLoading(true);
+
+        const schemes: Scheme[] =
+          await getSchemes();
+
+        const currentScheme =
+          schemes.find(
+            (item) =>
+              item.code.toLowerCase() ===
+              schemeCode.toLowerCase(),
+          ) ?? null;
+
+        setScheme(currentScheme);
+
+        if (!currentScheme) {
+          setPrograms([]);
+          return;
+        }
+
+        const data: Program[] =
+          await getProgramsByScheme(
+            currentScheme.id,
+          );
+
+        setPrograms(data);
+      } catch (error) {
+        console.error(error);
+        setPrograms([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPrograms();
+  }, [schemeCode]);
+
+  if (loading) {
+    return (
+      <section className="courses-layout">
+        <div className="courses-content">
+          <p>Loading programs...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!scheme) {
+    return (
+      <section className="courses-layout">
+        <div className="courses-content">
+          <p>Scheme not found.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const schemePath =
+    scheme.code.toLowerCase();
+
+  const footerText = programs.length
+    ? `Showing 1 to ${programs.length} of ${programs.length}`
+    : "No programs found";
 
   return (
     <section className="courses-layout">
@@ -115,11 +197,11 @@ export function CoursesSection({
         <div className="courses-page__header">
           <div>
             <span className="courses-page__eyebrow">
-              COIR VIKAS YOJANA
+              {scheme.code}
             </span>
 
             <h1 className="courses-page__title">
-              {schemeTitle}
+              {scheme.name}
             </h1>
           </div>
 
@@ -134,22 +216,34 @@ export function CoursesSection({
               </option>
             </select>
 
-            <button type="button">
-              ⬛
+            <button
+              type="button"
+              aria-label="Grid view"
+            >
+              <i
+                className="bx bx-grid-alt"
+                aria-hidden="true"
+              />
             </button>
 
-            <button type="button">
-              ☰
+            <button
+              type="button"
+              aria-label="List view"
+            >
+              <i
+                className="bx bx-list-ul"
+                aria-hidden="true"
+              />
             </button>
           </div>
         </div>
 
         <div className="courses-page__grid">
-          {filteredCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              schemeId={schemeId}
+          {programs.map((program) => (
+            <ProgramsCard
+              key={program.id}
+              program={program}
+              schemeId={schemePath}
             />
           ))}
         </div>
@@ -163,9 +257,7 @@ export function CoursesSection({
           </button>
 
           <div className="courses-pagination">
-            <span>
-              Showing 1 to 6 of 7
-            </span>
+            <span>{footerText}</span>
 
             <div>
               <button>{"<"}</button>
@@ -173,8 +265,6 @@ export function CoursesSection({
               <button className="active">
                 1
               </button>
-
-              <button>2</button>
 
               <button>{">"}</button>
             </div>

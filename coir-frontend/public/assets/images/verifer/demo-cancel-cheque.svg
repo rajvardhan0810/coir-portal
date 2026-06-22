@@ -1,0 +1,35 @@
+<svg width="720" height="360" viewBox="0 0 720 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="360" rx="18" fill="#FFF6DA"/>
+  <rect x="18" y="18" width="684" height="324" rx="12" fill="#FFFBEF" stroke="#D7C49C" stroke-width="2"/>
+  <rect x="30" y="30" width="660" height="300" rx="10" fill="#FFF7E7" stroke="#E4D4AE" stroke-width="2"/>
+  <text x="58" y="86" fill="#394158" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700">CHEQUE</text>
+  <text x="500" y="86" fill="#394158" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">DATE</text>
+  <rect x="566" y="62" width="86" height="28" rx="4" fill="#FFFFFF" stroke="#C8B893"/>
+  <text x="579" y="82" fill="#67708C" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">XX/XX/XX</text>
+  <circle cx="658" cy="86" r="16" fill="#FFFFFF" stroke="#C8B893"/>
+  <path d="M648 86H668M658 76V96M651 79C656 83 660 89 665 93M665 79C660 83 656 89 651 93" stroke="#717A93" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="58" y="132" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">ADDRESS | CITY | STATE | ZIP CODE</text>
+  <line x1="58" y1="144" x2="662" y2="144" stroke="#8C8A84" stroke-width="2"/>
+  <text x="58" y="198" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">FROM</text>
+  <line x1="140" y1="203" x2="472" y2="203" stroke="#8C8A84" stroke-width="2"/>
+  <text x="165" y="198" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">XXXXXXXX-YYYYYYYY-ZZZZZZZZ</text>
+  <text x="58" y="244" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">AMOUNT</text>
+  <line x1="164" y1="249" x2="462" y2="249" stroke="#8C8A84" stroke-width="2"/>
+  <text x="170" y="244" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">XOXOXOXOXOXOXOXO</text>
+  <rect x="488" y="216" width="122" height="34" rx="4" fill="#FFFFFF"/>
+  <text x="545" y="240" text-anchor="middle" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">₹₹₹</text>
+  <text x="648" y="246" fill="#394158" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">₹</text>
+  <text x="58" y="292" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">PURPOSE</text>
+  <line x1="154" y1="297" x2="600" y2="297" stroke="#8C8A84" stroke-width="2"/>
+  <text x="164" y="292" fill="#4E5568" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">XXXXXXXX-YYYYYYYY-ZXXXXXXX</text>
+  <text x="62" y="330" fill="#394158" font-family="Courier New, monospace" font-size="18" font-weight="700">0152 - 635486565 - 4526589 - 60045</text>
+  <circle cx="524" cy="316" r="10" fill="#21C888" fill-opacity="0.95"/>
+  <circle cx="538" cy="316" r="10" fill="#17B37D" fill-opacity="0.85"/>
+  <circle cx="626" cy="316" r="12" fill="#2BC76F"/>
+  <text x="640" y="322" fill="#31B85C" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">MONEY</text>
+  <text x="640" y="306" fill="#31B85C" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">BANK</text>
+  <g transform="rotate(-38 360 180)">
+    <rect x="182" y="146" width="356" height="62" rx="6" fill="none" stroke="#EB4158" stroke-width="8"/>
+    <text x="360" y="188" text-anchor="middle" fill="#EB4158" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">CANCELLED</text>
+  </g>
+</svg>

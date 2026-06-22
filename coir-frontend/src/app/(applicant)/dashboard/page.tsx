@@ -14,20 +14,25 @@ import { getAuthUser } from "@/store/authStore";
 
 export default function DashboardPage() {
   const [userName, setUserName] =
-    useState(() =>
-      getAuthUser()?.fullName ??
-      "Applicant",
-    );
+    useState<string>("");
 
   useEffect(() => {
+    const storedUser =
+      getAuthUser();
+
+    if (storedUser?.fullName) {
+      setUserName(
+        storedUser.fullName,
+      );
+    }
+
     async function loadUser() {
       try {
         const user =
           await getCurrentUser();
 
         setUserName(
-          user.fullName ??
-            "Applicant",
+          user.fullName ?? "",
         );
       } catch (error) {
         console.error(error);
@@ -39,7 +44,9 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <WelcomeSection userName={userName} />
+      <WelcomeSection
+        userName={userName}
+      />
 
       <AlertsSection />
 

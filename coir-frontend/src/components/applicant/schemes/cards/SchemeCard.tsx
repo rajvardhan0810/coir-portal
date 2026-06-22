@@ -19,8 +19,8 @@ export function SchemeCard({
 
         <div className="scheme-card__icon">
           <Image
-            src={scheme.image}
-            alt={scheme.title}
+            src="/assets/images/logo.svg"
+            alt={scheme.name}
             width={28}
             height={28}
           />
@@ -28,7 +28,7 @@ export function SchemeCard({
       </div>
 
       <h3 className="scheme-card__title">
-        {scheme.title}
+        {scheme.name}
       </h3>
 
       <p className="scheme-card__description">
@@ -37,14 +37,14 @@ export function SchemeCard({
 
       <div className="scheme-card__actions">
         <Link
-          href={`/schemes/${scheme.id}`}
+          href={`/schemes/${scheme.code.toLowerCase()}`}
           className="scheme-card__apply"
         >
           Apply Now
         </Link>
 
         <Link
-          href={`/schemes/${scheme.id}/details`}
+          href={`/schemes/${scheme.code.toLowerCase()}/details`}
           className="scheme-card__details"
         >
           View Details

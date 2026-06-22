@@ -15,8 +15,13 @@ enum UserType {
 enum ApplicationStatus {
   DRAFT
   SUBMITTED
-  APPROVED
   REJECTED
+  UNDER_REVIEW
+
+  CLARIFICATION_SOUGHT
+
+  VERIFIED
+  APPROVED
 }
 
 model User {
@@ -53,6 +58,9 @@ model Profile {
 
   gender String?
 
+  fatherName String?
+  caste      String?
+
   photo String?
 
   address    String?
@@ -79,7 +87,7 @@ model Scheme {
 
   duration String?
 
-  stipend Decimal? @db.Decimal(10,2)
+  stipend Decimal? @db.Decimal(10, 2)
 
   isActive Boolean @default(true)
 
@@ -87,9 +95,8 @@ model Scheme {
   updatedAt DateTime @updatedAt
 
   applications Application[]
-  courses Course[]
+  programs     Program[]
 }
-
 
 model TrainingCentre {
   id Int @id @default(autoincrement())
@@ -110,7 +117,7 @@ model TrainingCentre {
   applications Application[]
 }
 
-model Course {
+model Program {
   id Int @id @default(autoincrement())
 
   schemeId Int
@@ -144,14 +151,14 @@ model Application {
 
   schemeId Int
 
-  courseId Int
+  programId Int
 
   trainingCentreId Int?
 
   status ApplicationStatus @default(DRAFT)
 
   currentStep Int @default(1)
-  
+
   submittedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -161,7 +168,7 @@ model Application {
 
   scheme Scheme @relation(fields: [schemeId], references: [id])
 
-  course Course @relation(fields: [courseId], references: [id])
+  program Program @relation(fields: [programId], references: [id])
 
   trainingCentre TrainingCentre? @relation(fields: [trainingCentreId], references: [id])
 

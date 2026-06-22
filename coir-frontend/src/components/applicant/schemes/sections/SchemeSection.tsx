@@ -1,7 +1,41 @@
-import { schemes } from "../data/schemes-data";
+"use client";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { SchemeCard } from "../cards/SchemeCard";
+import type { Scheme } from "../types/scheme.type";
+
+import {
+  getSchemes,
+} from "@/services/scheme.service";
 
 export function SchemesSection() {
+  const [schemes, setSchemes] =
+    useState<Scheme[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    async function loadSchemes() {
+      try {
+        const data: Scheme[] =
+          await getSchemes();
+
+        setSchemes(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadSchemes();
+  }, []);
+
   return (
     <section className="schemes-page">
       {/* Left Filters */}
@@ -84,14 +118,20 @@ export function SchemesSection() {
           </span>
         </div>
 
-        <div className="schemes-grid">
-          {schemes.map((scheme) => (
-            <SchemeCard
-              key={scheme.id}
-              scheme={scheme}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <p>Loading schemes...</p>
+        ) : (
+          <div className="schemes-grid">
+            {schemes.map(
+              (scheme) => (
+                <SchemeCard
+                  key={scheme.id}
+                  scheme={scheme}
+                />
+              ),
+            )}
+          </div>
+        )}
 
         {/* Pagination */}
 

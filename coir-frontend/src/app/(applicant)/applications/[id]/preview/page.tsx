@@ -111,7 +111,7 @@ export default function PreviewPage() {
           application={application}
         />
 
-        <DeclarationSection />
+        
 
         <PreviewActions
           applicationId={applicationId}

@@ -1,16 +1,16 @@
-export default function AdminLoginPage() {
-  return (
-    <div
-      style={{
-        padding: "50px",
-        textAlign: "center",
-      }}
-    >
-      <h1>Admin Login</h1>
+"use client";
 
-      <p>
-        Under Development
-      </p>
-    </div>
-  );
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AdminLoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace(
+      "/admin/applications",
+    );
+  }, [router]);
+
+  return null;
 }

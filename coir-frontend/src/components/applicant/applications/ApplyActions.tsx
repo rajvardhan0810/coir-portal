@@ -7,12 +7,12 @@ import { createApplication } from "@/services/application.service";
 
 type Props = {
   schemeId: number;
-  courseId: number;
+  programId: number;
 };
 
 export function ApplyActions({
   schemeId,
-  courseId,
+  programId,
 }: Props) {
   const router = useRouter();
 
@@ -26,7 +26,7 @@ export function ApplyActions({
       const application =
         await createApplication(
           schemeId,
-          courseId,
+          programId,
         );
 
       router.push(

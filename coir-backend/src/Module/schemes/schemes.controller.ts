@@ -18,12 +18,12 @@ export class SchemesController {
     return this.schemesService.findAll();
   }
 
-  @Get(':schemeId/courses')
-  async findCoursesBySchemeId(
+  @Get(':schemeId/programs')
+  async findProgramsBySchemeId(
     @Param('schemeId', ParseIntPipe)
     schemeId: number,
   ) {
-    return this.schemesService.findCoursesBySchemeId(
+    return this.schemesService.findProgramsBySchemeId(
       schemeId,
     );
   }

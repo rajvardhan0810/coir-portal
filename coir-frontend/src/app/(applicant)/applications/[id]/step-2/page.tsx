@@ -52,6 +52,10 @@ export default function StepTwoPage() {
 
   const [bankDetails, setBankDetails] =
     useState({
+      aadhaarNumber: "",
+      panNumber: "",
+      tenthMarks: "",
+      twelfthMarks: "",
       bankName: "",
       accountHolderName: "",
       accountNumber: "",

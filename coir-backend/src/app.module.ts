@@ -14,6 +14,7 @@ import { SchemesModule } from './Module/schemes/schemes.module';
 import { ApplicationModule } from './Module/application/application.module';
 import { TrainingCentresModule } from './Module/training-centres/training-centres.module';
 import { UploadModule } from './Module/upload/upload.module';
+import { ProfileModule } from './Module/profile/profile.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UploadModule } from './Module/upload/upload.module';
     TrainingCentresModule,
 
     UploadModule,
+    ProfileModule,
   ],
 
   controllers: [

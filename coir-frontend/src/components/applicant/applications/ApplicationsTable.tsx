@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import Link from "next/link";
+
 import { getMyApplications } from "@/services/application.service";
 
 type Application = {
@@ -100,12 +102,13 @@ export function ApplicationsTable() {
 
                   <td>
                     <div className="application-actions">
-                      <button
-                        type="button"
+
+                      <Link
+                        href={`/applications/${application.id}/view`}
                         className="application-btn application-btn--view"
                       >
                         View
-                      </button>
+                      </Link>
 
                       <button
                         type="button"
@@ -113,6 +116,7 @@ export function ApplicationsTable() {
                       >
                         Track Status
                       </button>
+
                     </div>
                   </td>
                 </tr>

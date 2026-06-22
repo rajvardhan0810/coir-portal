@@ -52,7 +52,7 @@ export function StepOneActions({
 
           documents,
 
-          currentStep: 1,
+          currentStep: 2,
         },
       );
 
@@ -82,7 +82,7 @@ export function StepOneActions({
 
           documents,
 
-          currentStep: 1,
+          currentStep: 2,
         },
       );
 

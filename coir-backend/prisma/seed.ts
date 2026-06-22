@@ -32,7 +32,7 @@ async function main() {
     },
   });
 
-  await prisma.scheme.upsert({
+  const st= await prisma.scheme.upsert({
     where: {
       code: "ST",
     },
@@ -45,7 +45,7 @@ async function main() {
     },
   });
 
-  await prisma.scheme.upsert({
+  const dmp = await prisma.scheme.upsert({
     where: {
       code: "DMP",
     },
@@ -58,7 +58,7 @@ async function main() {
     },
   });
 
-  await prisma.scheme.upsert({
+  const emp = await prisma.scheme.upsert({
     where: {
       code: "EMP",
     },
@@ -115,9 +115,9 @@ async function main() {
     }
   }
 
-  // COURSES
+  // Programs
 
-  const courses = [
+  const programs = [
     {
       title: "Diploma Course in Coir Technology",
       category: "Skill Training",
@@ -160,26 +160,114 @@ async function main() {
     },
   ];
 
-  for (const course of courses) {
+  await seedPrograms(cvy.id, programs);
+
+  await seedPrograms(st.id, [
+    {
+      title:
+        "Production Process Modernization Workshop",
+      category: "Workshop",
+      duration: "1-2 Weeks",
+      benefit:
+        "Advanced fibre extraction and processing training",
+    },
+    {
+      title:
+        "Quality Testing & Certification Course",
+      category: "Certification",
+      duration: "1 Week",
+      benefit:
+        "Quality standards and Eco-Mark certification",
+    },
+    {
+      title:
+        "Technology Upgradation Training",
+      category: "Training",
+      duration: "2 Weeks",
+      benefit:
+        "Modern coir technology training",
+    },
+  ]);
+
+  await seedPrograms(dmp.id, [
+    {
+      title:
+        "Domestic Exhibition Participation",
+      category: "Exhibition",
+      duration: "Event Based",
+      benefit:
+        "Subsidized participation in trade fairs",
+    },
+    {
+      title:
+        "Coir Product Branding & Publicity",
+      category: "Marketing",
+      duration: "Annual",
+      benefit:
+        "Brand promotion support",
+    },
+    {
+      title:
+        "Online Marketing Portal Training",
+      category: "Digital Marketing",
+      duration: "1 Week",
+      benefit:
+        "Online sales and marketing training",
+    },
+  ]);
+
+  await seedPrograms(emp.id, [
+    {
+      title:
+        "International Trade Fair Participation",
+      category: "Export Promotion",
+      duration: "Event Based",
+      benefit:
+        "International market exposure",
+    },
+    {
+      title:
+        "Export Sales-Cum-Study Tour",
+      category: "Study Tour",
+      duration: "Trip Based",
+      benefit:
+        "Export market development",
+    },
+    {
+      title:
+        "Export Quality Compliance Workshop",
+      category: "Workshop",
+      duration: "1 Week",
+      benefit:
+        "Training on export quality standards",
+    },
+  ]);
+  
+  console.log("✅ Seed completed");
+}
+
+async function seedPrograms(
+  schemeId: number,
+  programs: any[],
+) {
+  for (const program of programs) {
     const existing =
-      await prisma.course.findFirst({
+      await prisma.program.findFirst({
         where: {
-          title: course.title,
-          schemeId: cvy.id,
+          title: program.title,
+          schemeId,
         },
       });
 
     if (!existing) {
-      await prisma.course.create({
+      await prisma.program.create({
         data: {
-          ...course,
-          schemeId: cvy.id,
+          ...program,
+          schemeId,
         },
       });
     }
   }
-
-  console.log("✅ Seed completed");
 }
 
 main()

@@ -12,7 +12,9 @@ export function WelcomeSection({
       </span>
 
       <h1 className="welcome-section__title">
-        Welcome, {userName}
+        {userName
+          ? `Welcome, ${userName}`
+          : "Welcome"}
       </h1>
     </section>
   );

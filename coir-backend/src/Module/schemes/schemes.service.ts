@@ -19,10 +19,10 @@ export class SchemesService {
     });
   }
 
-  async findCoursesBySchemeId(
+  async findProgramsBySchemeId(
     schemeId: number,
   ) {
-    return this.prisma.course.findMany({
+    return this.prisma.program.findMany({
       where: {
         schemeId,
         isActive: true,

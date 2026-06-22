@@ -11,7 +11,7 @@ export class ApplicationService {
   async createDraft(
     userId: number,
     schemeId: number,
-    courseId: number,
+    programId: number,
   ) {
     const count =
       await this.prisma.application.count();
@@ -25,7 +25,7 @@ export class ApplicationService {
         applicationNo,
         userId,
         schemeId,
-        courseId,
+        programId,
 
         // NEW
         currentStep: 1,
@@ -39,11 +39,16 @@ export class ApplicationService {
     return this.prisma.application.findMany({
       where: {
         userId,
+
+        currentStep: {
+          gt: 1,
+        },
+
       },
 
       include: {
         scheme: true,
-        course: true,
+        program: true,
         trainingCentre: true,
       },
 
@@ -153,7 +158,7 @@ export class ApplicationService {
 
       include: {
         scheme: true,
-        course: true,
+        program: true,
         trainingCentre: true,
 
         detail: true,
@@ -202,5 +207,144 @@ export class ApplicationService {
       message:
         'Application submitted successfully',
     };
+  }
+
+  async findAll() {
+    return this.prisma.application.findMany({
+      where: {
+        status: {
+          not: 'DRAFT',
+        },
+      },
+      include: {
+        scheme: true,
+        program: true,
+        trainingCentre: true,
+        detail: true,
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async bulkApprove(applicationIds: number[]) {
+    await this.prisma.application.updateMany({
+      where: {
+        id: {
+          in: applicationIds,
+        },
+      },
+      data: {
+        status: 'VERIFIED',
+      },
+    });
+
+    for (const id of applicationIds) {
+      await this.prisma.applicationLog.create({
+        data: {
+          applicationId: id,
+          action: 'VERIFIED',
+          remarks: 'Application bulk approved by Verifier Committee',
+        },
+      });
+    }
+
+    return {
+      message: `${applicationIds.length} applications approved successfully`,
+    };
+  }
+
+  async bulkFinalApprove(remarks?: string) {
+    const verifiedApps = await this.prisma.application.findMany({
+      where: {
+        status: 'VERIFIED',
+      },
+    });
+
+    if (verifiedApps.length === 0) {
+      return {
+        message: 'No verified applications found to approve',
+        count: 0,
+      };
+    }
+
+    const verifiedIds = verifiedApps.map((app) => app.id);
+
+    await this.prisma.application.updateMany({
+      where: {
+        id: {
+          in: verifiedIds,
+        },
+      },
+      data: {
+        status: 'APPROVED',
+      },
+    });
+
+    for (const id of verifiedIds) {
+      await this.prisma.applicationLog.create({
+        data: {
+          applicationId: id,
+          action: 'APPROVED',
+          remarks: remarks ?? 'Application approved by Verifier Committee',
+        },
+      });
+    }
+
+    return {
+      message: `${verifiedIds.length} applications approved successfully`,
+      count: verifiedIds.length,
+    };
+  }
+
+  async approve(applicationId: number) {
+    await this.prisma.application.update({
+      where: { id: applicationId },
+      data: { status: 'VERIFIED' },
+    });
+    await this.prisma.applicationLog.create({
+      data: {
+        applicationId,
+        action: 'VERIFIED',
+        remarks: 'Application approved by Verifier Committee',
+      },
+    });
+    return { message: 'Application approved successfully' };
+  }
+
+  async seekClarification(applicationId: number, remarks?: string) {
+    await this.prisma.application.update({
+      where: { id: applicationId },
+      data: { status: 'CLARIFICATION_SOUGHT' },
+    });
+    await this.prisma.applicationLog.create({
+      data: {
+        applicationId,
+        action: 'CLARIFICATION_SOUGHT',
+        remarks: remarks ?? 'Clarification sought by Verifier Committee',
+      },
+    });
+    return { message: 'Clarification sought successfully' };
+  }
+
+  async sendToReview(applicationId: number, remarks?: string) {
+    await this.prisma.application.update({
+      where: { id: applicationId },
+      data: { status: 'UNDER_REVIEW' },
+    });
+    await this.prisma.applicationLog.create({
+      data: {
+        applicationId,
+        action: 'UNDER_REVIEW',
+        remarks: remarks ?? 'Application sent back to review',
+      },
+    });
+    return { message: 'Application sent back to review successfully' };
   }
 }

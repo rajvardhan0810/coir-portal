@@ -1,21 +1,28 @@
 import Link from "next/link";
 
-import type { Course } from "../types/course.type";
+import type { Program } from "../types/programs.type";
 
 type Props = {
   schemeId: string;
-  course: Course;
+  program: Program;
 };
 
-export function CourseCard({
+export function ProgramsCard({
   schemeId,
-  course,
+  program,
 }: Props) {
+  const tags =
+    program.tags?.length
+      ? program.tags
+      : program.category
+        ? [program.category]
+        : [];
+
   return (
     <article className="scheme-course-card">
       <div className="scheme-course-card__top">
         <div className="scheme-course-card__badges">
-          {course.tags.map((tag) => (
+          {tags.map((tag) => (
             <span
               key={tag}
               className="scheme-course-card__badge"
@@ -25,30 +32,30 @@ export function CourseCard({
           ))}
         </div>
 
-        {course.level ? (
+        {program.level ? (
           <span className="scheme-course-card__level">
-            {course.level}
+            {program.level}
           </span>
         ) : null}
       </div>
 
       <h3 className="scheme-course-card__title">
-        {course.title}
+        {program.title}
       </h3>
 
       <div className="scheme-course-card__meta">
-        {course.duration ? (
-          <span>{course.duration}</span>
+        {program.duration ? (
+          <span>{program.duration}</span>
         ) : null}
 
-        {course.benefit ? (
-          <span>{course.benefit}</span>
+        {program.benefit ? (
+          <span>{program.benefit}</span>
         ) : null}
       </div>
 
       <div className="scheme-course-card__actions">
         <Link
-          href={`/schemes/${schemeId}/${course.id}/apply`}
+          href={`/schemes/${schemeId}/${program.id}/apply`}
           className="scheme-course-card__apply"
         >
           Apply Now
