@@ -25,13 +25,9 @@ export class AuthService {
   private readonly captchas = new Map<string, CaptchaRecord>();
 
   private readonly captchaTtlMs = 10 * 60 * 1000;
-<<<<<<< HEAD
-  private readonly otpTtlMs = 5 * 10 * 1000;
-  private readonly businessLoginMobile = '9625732059';
-  private readonly businessLoginPassword = '1234';
-=======
   private readonly otpTtlMs = 10 * 60 * 1000;
->>>>>>> 9f500fb4d41b504fa77425769dad80517398b63f
+  private readonly businessLoginMobile = '9625732059';
+  private readonly businessLoginPassword = '123456789';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -114,7 +110,19 @@ export class AuthService {
         },
       },
       include: {
-        profile: true,
+        profile: {
+          select: {
+            fullName: true,
+            dob: true,
+            gender: true,
+            address: true,
+            city: true,
+            district: true,
+            state: true,
+            country: true,
+            postalCode: true,
+          },
+        },
       },
     });
 
@@ -146,7 +154,19 @@ export class AuthService {
         mobile,
       },
       include: {
-        profile: true,
+        profile: {
+          select: {
+            fullName: true,
+            dob: true,
+            gender: true,
+            address: true,
+            city: true,
+            district: true,
+            state: true,
+            country: true,
+            postalCode: true,
+          },
+        },
       },
     });
 
@@ -224,7 +244,6 @@ export class AuthService {
     ...tokens,
     user: this.toPublicUser(user),
   };
-<<<<<<< HEAD
   }
 
   private async loginBusinessUser(
@@ -259,7 +278,19 @@ export class AuthService {
           },
         },
         include: {
-          profile: true,
+          profile: {
+            select: {
+              fullName: true,
+              dob: true,
+              gender: true,
+              address: true,
+              city: true,
+              district: true,
+              state: true,
+              country: true,
+              postalCode: true,
+            },
+          },
         },
       });
 
@@ -291,10 +322,6 @@ export class AuthService {
       user: this.toPublicUser(user),
     };
   }
-
-=======
-}
->>>>>>> 9f500fb4d41b504fa77425769dad80517398b63f
 
   async sendOtp(dto: SendOtpDto) {
   const user = await this.prisma.user.findUnique({
@@ -439,7 +466,19 @@ export class AuthService {
           id: userId,
         },
         include: {
-          profile: true,
+          profile: {
+            select: {
+              fullName: true,
+              dob: true,
+              gender: true,
+              address: true,
+              city: true,
+              district: true,
+              state: true,
+              country: true,
+              postalCode: true,
+            },
+          },
         },
       });
 

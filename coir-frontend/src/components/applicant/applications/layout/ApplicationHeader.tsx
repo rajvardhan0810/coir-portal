@@ -15,7 +15,11 @@ from "@/constants/api-endpoints";
 import { ROUTES }
 from "@/constants/routes";
 
-export function ApplicationHeader() {
+type ApplicationHeaderProps = {
+  onLogout?: () => Promise<void> | void;
+};
+
+export function ApplicationHeader({ onLogout }: ApplicationHeaderProps) {
   const router = useRouter();
 
   const [userName, setUserName] =
@@ -29,7 +33,7 @@ export function ApplicationHeader() {
     }
   }, []);
 
-  async function handleLogout() {
+  async function defaultLogout() {
     try {
       await axiosInstance.post(
         API_ENDPOINTS.auth.logout,
@@ -43,6 +47,15 @@ export function ApplicationHeader() {
         ROUTES.login,
       );
     }
+  }
+
+  async function handleLogout() {
+    if (onLogout) {
+      await onLogout();
+      return;
+    }
+
+    await defaultLogout();
   }
 
   return (

@@ -13,13 +13,23 @@ import type { CaptchaResponse } from "@/types/auth.types";
 
 type LoginFormProps = {
   userType?: "INDIVIDUAL" | "BUSINESS";
+  defaultMobile?: string;
+  defaultPassword?: string;
 };
 
-export function LoginForm({ userType = "INDIVIDUAL" }: LoginFormProps) {
+export function LoginForm({
+  userType = "INDIVIDUAL",
+  defaultMobile,
+  defaultPassword,
+}: LoginFormProps) {
   const router = useRouter();
   const isBusinessUser = userType === "BUSINESS";
-  const [mobile, setMobile] = useState("");
-  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState(
+    isBusinessUser ? (defaultMobile ?? "") : "",
+  );
+  const [password, setPassword] = useState(
+    isBusinessUser ? (defaultPassword ?? "") : "",
+  );
   const [otp, setOtp] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captcha, setCaptcha] = useState<CaptchaResponse | null>(null);
@@ -30,7 +40,11 @@ export function LoginForm({ userType = "INDIVIDUAL" }: LoginFormProps) {
   async function loadCaptcha() {
     const nextCaptcha = await getCaptcha();
     setCaptcha(nextCaptcha);
-    setCaptchaAnswer("");
+    setCaptchaAnswer(
+      isBusinessUser
+        ? (nextCaptcha.devCaptchaCode ?? "")
+        : "",
+    );
   }
 
   useEffect(() => {
@@ -40,7 +54,11 @@ export function LoginForm({ userType = "INDIVIDUAL" }: LoginFormProps) {
       .then((nextCaptcha) => {
         if (isActive) {
           setCaptcha(nextCaptcha);
-          setCaptchaAnswer("");
+          setCaptchaAnswer(
+            isBusinessUser
+              ? (nextCaptcha.devCaptchaCode ?? "")
+              : "",
+          );
         }
       })
       .catch(() => {
@@ -94,7 +112,9 @@ export function LoginForm({ userType = "INDIVIDUAL" }: LoginFormProps) {
         response.refreshToken,
         response.user
     );
-      router.push(isBusinessUser ? ROUTES.businessDashboard : ROUTES.dashboard);
+      router.replace(
+        isBusinessUser ? ROUTES.businessDashboard : ROUTES.dashboard,
+      );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Login failed");
       await loadCaptcha().catch(() => {
