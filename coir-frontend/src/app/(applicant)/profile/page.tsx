@@ -1,17 +1,12 @@
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import { Header } from "@/components/dashboard/Header";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+"use client";
+
+import { DashboardLayout } from "@/components/applicant/dashboards/layout/DashboardLayout";
+import { ProfileForm } from "@/components/applicant/profile/ProfileForm";
 
 export default function ProfilePage() {
   return (
-    <main className="dashboard-page">
-      <section className="dashboard-shell">
-        <Header />
-        <Sidebar />
-        <DashboardCard eyebrow="Applicant" title="Profile">
-          <p className="auth-message">Profile details will appear here after login.</p>
-        </DashboardCard>
-      </section>
-    </main>
+    <DashboardLayout>
+      <ProfileForm />
+    </DashboardLayout>
   );
 }

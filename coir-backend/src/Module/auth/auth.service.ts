@@ -25,9 +25,13 @@ export class AuthService {
   private readonly captchas = new Map<string, CaptchaRecord>();
 
   private readonly captchaTtlMs = 10 * 60 * 1000;
+<<<<<<< HEAD
   private readonly otpTtlMs = 5 * 10 * 1000;
   private readonly businessLoginMobile = '9625732059';
   private readonly businessLoginPassword = '1234';
+=======
+  private readonly otpTtlMs = 10 * 60 * 1000;
+>>>>>>> 9f500fb4d41b504fa77425769dad80517398b63f
 
   constructor(
     private readonly prisma: PrismaService,
@@ -121,7 +125,7 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginUserDto) {
+ async login(dto: LoginUserDto) {
   this.validateCaptcha(
     dto.captchaId ?? '',
     this.getCaptchaCode(dto),
@@ -140,6 +144,9 @@ export class AuthService {
     await this.prisma.user.findUnique({
       where: {
         mobile,
+      },
+      include: {
+        profile: true,
       },
     });
 
@@ -217,6 +224,7 @@ export class AuthService {
     ...tokens,
     user: this.toPublicUser(user),
   };
+<<<<<<< HEAD
   }
 
   private async loginBusinessUser(
@@ -284,6 +292,9 @@ export class AuthService {
     };
   }
 
+=======
+}
+>>>>>>> 9f500fb4d41b504fa77425769dad80517398b63f
 
   async sendOtp(dto: SendOtpDto) {
   const user = await this.prisma.user.findUnique({

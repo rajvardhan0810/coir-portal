@@ -1,0 +1,27 @@
+<svg width="720" height="920" viewBox="0 0 720 920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="920" fill="#ECECEC"/>
+  <rect x="58" y="28" width="604" height="850" rx="8" fill="white" stroke="#D8D8D8"/>
+  <text x="360" y="110" text-anchor="middle" fill="#202020" font-family="Georgia, Times New Roman, serif" font-size="28" font-weight="700">Sample of the Experience Letter:</text>
+  <line x1="208" y1="118" x2="512" y2="118" stroke="#202020" stroke-width="2"/>
+  <text x="102" y="190" fill="#383838" font-family="Georgia, Times New Roman, serif" font-size="18">Hansen Ice Cream</text>
+  <text x="102" y="225" fill="#383838" font-family="Georgia, Times New Roman, serif" font-size="18">ABC</text>
+  <text x="102" y="260" fill="#383838" font-family="Georgia, Times New Roman, serif" font-size="18">Address: ............</text>
+  <text x="540" y="162" text-anchor="end" fill="#383838" font-family="Georgia, Times New Roman, serif" font-size="18">Date:</text>
+  <text x="360" y="338" text-anchor="middle" fill="#2E2E2E" font-family="Georgia, Times New Roman, serif" font-size="20" font-weight="700">To whom it may concern:</text>
+  <line x1="266" y1="346" x2="454" y2="346" stroke="#202020" stroke-width="1.5"/>
+  <text x="102" y="424" fill="#3B3B3B" font-family="Georgia, Times New Roman, serif" font-size="17">
+    <tspan x="102" dy="0">I hereby verify that Michelle P. Rivera has been working in our organization from the period of</tspan>
+    <tspan x="102" dy="34">July 12th, 2004 to November 18th, 2009. While employed with Hansen Ice Cream, her</tspan>
+    <tspan x="102" dy="34">responsibilities have included interacting with our clients and providing them with information</tspan>
+    <tspan x="102" dy="34">on the steel products we distribute. She has done a fantastic job completing these tasks, and she</tspan>
+    <tspan x="102" dy="34">has always been on time and professional during his tenure here.</tspan>
+  </text>
+  <text x="102" y="654" fill="#3B3B3B" font-family="Georgia, Times New Roman, serif" font-size="17">
+    <tspan x="102" dy="0">She left us on November 18th, 2009 to pursue further education, and is now back looking for a</tspan>
+    <tspan x="102" dy="34">job. We would rehire her, but she is looking for something different than what we can offer.</tspan>
+    <tspan x="102" dy="34">We wish her every success in life.</tspan>
+  </text>
+  <text x="102" y="798" fill="#3B3B3B" font-family="Georgia, Times New Roman, serif" font-size="18">Sincerely,</text>
+  <text x="102" y="848" fill="#3B3B3B" font-family="Georgia, Times New Roman, serif" font-size="18">XYZ</text>
+  <text x="102" y="882" fill="#3B3B3B" font-family="Georgia, Times New Roman, serif" font-size="18">Managing Director</text>
+</svg>

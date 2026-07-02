@@ -93,19 +93,27 @@ export function Navbar() {
         </nav>
 
         <div className="auth-actions">
-          <Link
-            className="login-button"
-            href={ROUTES.login}
-          >
-            Login
-          </Link>
+          <details className="login-dropdown">
+            <summary className="login-button">
+              Login
+            </summary>
 
-          <Link
-            className="register-button"
-            href={ROUTES.register}
-          >
-            Register
-          </Link>
+            <div className="login-dropdown-menu">
+              <Link
+                href={ROUTES.login}
+                className="dropdown-item"
+              >
+                User Login
+              </Link>
+
+              <Link
+                href="/admin/login"
+                className="dropdown-item"
+              >
+                Admin Login
+              </Link>
+            </div>
+          </details>
         </div>
       </div>
     </header>

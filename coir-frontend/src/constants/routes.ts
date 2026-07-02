@@ -15,10 +15,10 @@ export const ROUTES = {
   businessDashboard: "/business/dashboard",
 
   // Applicant
-  dashboard: "/applicant/dashboard",
-  profile: "/applicant/profile",
-  applications: "/applicant/applications",
-  schemes: "/applicant/schemes",
+  dashboard: "/dashboard",
+  profile: "/profile",
+  applications: "/applications",
+  schemes: "/schemes",
 
   // Homepage Sections
   about: "/#about",
