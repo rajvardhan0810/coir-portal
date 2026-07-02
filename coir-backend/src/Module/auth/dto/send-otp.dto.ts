@@ -1,5 +1,6 @@
-import { IsMobilePhone } from 'class-validator';
+import { IsEnum, IsMobilePhone, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { UserType } from './register-user.dto';
 
 const normalizeMobile = ({ value }: { value: unknown }) =>
   typeof value === 'string'
@@ -7,6 +8,10 @@ const normalizeMobile = ({ value }: { value: unknown }) =>
     : value;
 
 export class SendOtpDto {
+  @IsOptional()
+  @IsEnum(UserType)
+  userType?: UserType;
+
   @Transform(normalizeMobile)
   @IsMobilePhone('en-IN')
   mobile: string;

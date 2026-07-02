@@ -8,19 +8,19 @@ const registrationCards = [
     title: "Coir Manufacturers",
     image: "/assets/images/services-img4.jpg",
     alt: "Coir Manufacturers",
-    href: ROUTES.register,
+    href: ROUTES.businessRegister,
   },
   {
     title: "Exporters",
     image: "/assets/images/services-img3.jpg",
     alt: "Exporters",
-    href: ROUTES.register,
+    href: ROUTES.businessRegister,
   },
   {
     title: "Clusters",
     image: "/assets/images/services-img2.jpg",
     alt: "Clusters",
-    href: ROUTES.register,
+    href: ROUTES.businessRegister,
   },
   {
     title: "Trade Events",

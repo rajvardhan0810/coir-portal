@@ -9,7 +9,11 @@ import { axiosInstance } from "@/lib/axios";
 
 import { clearAuthStorage } from "@/store/authStore";
 
-export function Header() {
+type HeaderProps = {
+  logoutHref?: string;
+};
+
+export function Header({ logoutHref = ROUTES.login }: HeaderProps) {
   const router = useRouter();
 
   async function logout() {
@@ -23,7 +27,7 @@ export function Header() {
       clearAuthStorage();
 
       router.replace(
-        ROUTES.login,
+        logoutHref,
       );
     }
   }

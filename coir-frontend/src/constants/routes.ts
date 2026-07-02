@@ -10,6 +10,9 @@ export const ROUTES = {
   // Auth
   login: "/login",
   register: "/register",
+  businessLogin: "/business-login",
+  businessRegister: "/business-register",
+  businessDashboard: "/business/dashboard",
 
   // Applicant
   dashboard: "/applicant/dashboard",
@@ -149,15 +152,15 @@ export const navigationItems: NavItem[] = [
     children: [
       {
         label: "COIR Manufacturers",
-        href: ROUTES.register,
+        href: ROUTES.businessRegister,
       },
       {
         label: "Exporters",
-        href: ROUTES.register,
+        href: ROUTES.businessRegister,
       },
       {
         label: "Clusters",
-        href: ROUTES.register,
+        href: ROUTES.businessRegister,
       },
       {
         label: "Coir Machinery",

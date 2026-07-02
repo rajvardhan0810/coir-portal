@@ -9,8 +9,15 @@ import { ROUTES } from "@/constants/routes";
 import { getCleanFormPayload } from "@/lib/utils";
 import { registerUser } from "@/services/auth.service";
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  userType?: "INDIVIDUAL" | "BUSINESS";
+};
+
+export function RegisterForm({
+  userType = "INDIVIDUAL",
+}: RegisterFormProps) {
   const router = useRouter();
+  const isBusinessUser = userType === "BUSINESS";
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,12 +36,15 @@ export function RegisterForm() {
 
     try {
       const response =
-        await registerUser(payload);
+        await registerUser({
+          ...payload,
+          userType,
+        } as Parameters<typeof registerUser>[0]);
 
       setMessage(response.message);
 
       window.setTimeout(() => {
-        router.push(ROUTES.login);
+        router.push(isBusinessUser ? ROUTES.businessLogin : ROUTES.login);
       }, 1500);
     } catch (error) {
       setMessage(
@@ -54,26 +64,25 @@ export function RegisterForm() {
         role="tablist"
         aria-label="User type"
       >
-        <button
-          className="auth-tab"
-          type="button"
-          disabled
+        <Link
+          className={`auth-tab${isBusinessUser ? " auth-tab--active" : ""}`}
+          href={ROUTES.businessRegister}
         >
           <span className="auth-tab__icon">
             Business
           </span>
           Business User
-        </button>
+        </Link>
 
-        <button
-          className="auth-tab auth-tab--active"
-          type="button"
+        <Link
+          className={`auth-tab${!isBusinessUser ? " auth-tab--active" : ""}`}
+          href={ROUTES.register}
         >
           <span className="auth-tab__icon">
             Individual
           </span>
           Individual User
-        </button>
+        </Link>
       </div>
 
       <form
@@ -227,7 +236,7 @@ export function RegisterForm() {
         </button>
 
         <p className="auth-switch">
-          <Link href={ROUTES.login}>
+          <Link href={isBusinessUser ? ROUTES.businessLogin : ROUTES.login}>
             Already registered? Sign In
           </Link>
         </p>

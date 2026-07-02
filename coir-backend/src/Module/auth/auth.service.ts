@@ -26,6 +26,8 @@ export class AuthService {
 
   private readonly captchaTtlMs = 10 * 60 * 1000;
   private readonly otpTtlMs = 5 * 10 * 1000;
+  private readonly businessLoginMobile = '9625732059';
+  private readonly businessLoginPassword = '1234';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -54,9 +56,7 @@ export class AuthService {
 
   async register(dto: RegisterUserDto) {
     const mobile = this.getMobile(dto);
-    // const password = dto.password ?? randomUUID();
-    // const userType = dto.userType ?? 'INDIVIDUAL';
-    const userType  = 'INDIVIDUAL';
+    const userType = dto.userType ?? 'INDIVIDUAL';
 
     const existingUser =
       await this.prisma.user.findFirst({
@@ -123,9 +123,16 @@ export class AuthService {
 
   async login(dto: LoginUserDto) {
   this.validateCaptcha(
-    dto.captchaId,
+    dto.captchaId ?? '',
     this.getCaptchaCode(dto),
   );
+
+  if (
+    dto.userType === 'BUSINESS' &&
+    dto.password
+  ) {
+    return this.loginBusinessUser(dto);
+  }
 
   const mobile = this.getMobile(dto);
 
@@ -139,6 +146,15 @@ export class AuthService {
   if (!user) {
     throw new UnauthorizedException(
       'User not found',
+    );
+  }
+
+  if (
+    dto.userType &&
+    user.userType !== dto.userType
+  ) {
+    throw new UnauthorizedException(
+      `${dto.userType === 'BUSINESS' ? 'Business' : 'Individual'} user not found`,
     );
   }
 
@@ -162,7 +178,7 @@ export class AuthService {
 
   const otpValid =
     await bcrypt.compare(
-      dto.otp,
+      dto.otp ?? '',
       user.otpHash,
     );
 
@@ -203,6 +219,71 @@ export class AuthService {
   };
   }
 
+  private async loginBusinessUser(
+    dto: LoginUserDto,
+  ) {
+    const mobile = this.getMobile(dto);
+
+    if (
+      mobile !== this.businessLoginMobile ||
+      dto.password !== this.businessLoginPassword
+    ) {
+      throw new UnauthorizedException(
+        'Invalid business login details',
+      );
+    }
+
+    const user =
+      await this.prisma.user.upsert({
+        where: {
+          mobile,
+        },
+        update: {
+          userType: 'BUSINESS',
+        },
+        create: {
+          mobile,
+          userType: 'BUSINESS',
+          profile: {
+            create: {
+              fullName: 'Business User',
+            },
+          },
+        },
+        include: {
+          profile: true,
+        },
+      });
+
+    const tokens =
+      await this.generateTokens(
+        user.id,
+        user.mobile,
+        user.userType,
+      );
+
+    const refreshTokenHash =
+      await bcrypt.hash(
+        tokens.refreshToken,
+        10,
+      );
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshTokenHash,
+      },
+    });
+
+    return {
+      message: 'Login successful',
+      ...tokens,
+      user: this.toPublicUser(user),
+    };
+  }
+
 
   async sendOtp(dto: SendOtpDto) {
   const user = await this.prisma.user.findUnique({
@@ -214,6 +295,15 @@ export class AuthService {
   if (!user) {
     throw new NotFoundException(
       'Mobile number is not registered',
+    );
+  }
+
+  if (
+    dto.userType &&
+    user.userType !== dto.userType
+  ) {
+    throw new NotFoundException(
+      `${dto.userType === 'BUSINESS' ? 'Business' : 'Individual'} user is not registered`,
     );
   }
 

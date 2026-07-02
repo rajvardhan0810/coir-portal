@@ -29,11 +29,28 @@ export async function sendOtp(mobile: string) {
   return response.data;
 }
 
+export async function sendUserTypeOtp(
+  mobile: string,
+  userType: "INDIVIDUAL" | "BUSINESS",
+) {
+  const response = await axiosInstance.post<SendOtpResponse>(
+    API_ENDPOINTS.auth.sendOtp,
+    {
+      mobile,
+      userType,
+    },
+  );
+
+  return response.data;
+}
+
 export async function loginWithOtp(payload: {
   mobile: string;
-  otp: string;
-  captchaId: string;
-  captchaCode: string;
+  otp?: string;
+  password?: string;
+  captchaId?: string;
+  captchaCode?: string;
+  userType?: "INDIVIDUAL" | "BUSINESS";
 }) {
   const response = await axiosInstance.post<LoginResponse>(
     API_ENDPOINTS.auth.login,
@@ -56,6 +73,7 @@ export async function registerUser(payload: {
   state?: string;
   country?: string;
   pincode?: string;
+  userType?: "INDIVIDUAL" | "BUSINESS";
 }) {
   const response = await axiosInstance.post<RegisterResponse>(
     API_ENDPOINTS.auth.register,

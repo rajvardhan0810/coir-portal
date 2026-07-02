@@ -7,13 +7,19 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { CaptchaBox } from "@/components/auth/CaptchaBox";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { ROUTES } from "@/constants/routes";
-import { getCaptcha, loginWithOtp, sendOtp } from "@/services/auth.service";
+import { getCaptcha, loginWithOtp, sendUserTypeOtp } from "@/services/auth.service";
 import { saveAuthSession } from "@/store/authStore";
 import type { CaptchaResponse } from "@/types/auth.types";
 
-export function LoginForm() {
+type LoginFormProps = {
+  userType?: "INDIVIDUAL" | "BUSINESS";
+};
+
+export function LoginForm({ userType = "INDIVIDUAL" }: LoginFormProps) {
   const router = useRouter();
+  const isBusinessUser = userType === "BUSINESS";
   const [mobile, setMobile] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captcha, setCaptcha] = useState<CaptchaResponse | null>(null);
@@ -52,7 +58,7 @@ export function LoginForm() {
     setLoading(true);
     setMessage("");
     try {
-      const response = await sendOtp(mobile);
+      const response = await sendUserTypeOtp(mobile, userType);
       setDevOtp(response.devOtp ?? "");
       setMessage(response.message);
     } catch (error) {
@@ -69,9 +75,18 @@ export function LoginForm() {
     try {
       const response = await loginWithOtp({
         mobile,
-        otp,
-        captchaId: captcha?.captchaId ?? "",
-        captchaCode: captchaAnswer,
+        ...(isBusinessUser
+          ? {
+              password,
+              captchaId: captcha?.captchaId ?? "",
+              captchaCode: captchaAnswer,
+            }
+          : {
+              otp,
+              captchaId: captcha?.captchaId ?? "",
+              captchaCode: captchaAnswer,
+            }),
+        userType,
       });
 
       saveAuthSession(
@@ -79,7 +94,7 @@ export function LoginForm() {
         response.refreshToken,
         response.user
     );
-      router.push(ROUTES.dashboard);
+      router.push(isBusinessUser ? ROUTES.businessDashboard : ROUTES.dashboard);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Login failed");
       await loadCaptcha().catch(() => {
@@ -93,20 +108,26 @@ export function LoginForm() {
   return (
     <AuthShell title="Sign In">
       <div className="auth-tabs" role="tablist" aria-label="User type">
-        <Link className="auth-tab" href={ROUTES.register}>
+        <Link
+          className={`auth-tab${isBusinessUser ? " auth-tab--active" : ""}`}
+          href={ROUTES.businessLogin}
+        >
           <span className="auth-tab__icon">Business</span>
           Business User
         </Link>
-        <button className="auth-tab auth-tab--active" type="button">
+        <Link
+          className={`auth-tab${!isBusinessUser ? " auth-tab--active" : ""}`}
+          href={ROUTES.login}
+        >
           <span className="auth-tab__icon">Individual</span>
           Individual User
-        </button>
+        </Link>
       </div>
 
       <form className="auth-card" onSubmit={login}>
         <label>
           Mobile Number <span className="required">*</span>
-          <span className="auth-input-action">
+          <span className={isBusinessUser ? "" : "auth-input-action"}>
             <input
               value={mobile}
               onChange={(event) => setMobile(event.target.value)}
@@ -116,24 +137,49 @@ export function LoginForm() {
               maxLength={10}
               required
             />
-            <button
-              type="button"
-              onClick={handleSendOtp}
-              disabled={loading || mobile.length !== 10}
-            >
-              Get OTP
-            </button>
+            {isBusinessUser ? null : (
+              <button
+                type="button"
+                onClick={handleSendOtp}
+                disabled={loading || mobile.length !== 10}
+              >
+                Get OTP
+              </button>
+            )}
           </span>
         </label>
 
-        {devOtp ? <p className="dev-otp">Dev OTP: {devOtp}</p> : null}
+        {isBusinessUser ? (
+          <>
+            <label>
+              Password <span className="required">*</span>
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter password"
+                type="password"
+                required
+              />
+            </label>
 
-        <OtpInput value={otp} onChange={setOtp} />
-        <CaptchaBox
-          captcha={captcha}
-          value={captchaAnswer}
-          onChange={setCaptchaAnswer}
-        />
+            <CaptchaBox
+              captcha={captcha}
+              value={captchaAnswer}
+              onChange={setCaptchaAnswer}
+            />
+          </>
+        ) : (
+          <>
+            {devOtp ? <p className="dev-otp">Dev OTP: {devOtp}</p> : null}
+
+            <OtpInput value={otp} onChange={setOtp} />
+            <CaptchaBox
+              captcha={captcha}
+              value={captchaAnswer}
+              onChange={setCaptchaAnswer}
+            />
+          </>
+        )}
 
         <button className="auth-primary" disabled={loading} type="submit">
           Sign in
@@ -150,7 +196,9 @@ export function LoginForm() {
         </button>
 
         <p className="auth-switch">
-          <Link href={ROUTES.register}>New user registration</Link>
+          <Link href={isBusinessUser ? ROUTES.businessRegister : ROUTES.register}>
+            New user registration
+          </Link>
         </p>
 
         {message ? <p className="auth-message">{message}</p> : null}

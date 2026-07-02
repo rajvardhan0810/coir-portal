@@ -60,9 +60,9 @@ export class RegisterUserDto {
   @MaxLength(100)
   password?: string;
 
-  // @IsOptional()
-  // @IsEnum(UserType)
-  // userType?: UserType;
+  @IsOptional()
+  @IsEnum(UserType)
+  userType?: UserType;
 
   @Transform(optionalTrimmedValue)
   @IsOptional()

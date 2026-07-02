@@ -1,12 +1,22 @@
 export type UserProfile = {
-  id: string;
-  fullName: string;
-  mobileNumber: string;
+  id: number | string;
+  mobile: string;
+  mobileNumber?: string;
   email?: string | null;
+  userType: string;
+  isActive: boolean;
+  fullName?: string | null;
+  dateOfBirth?: string | Date | null;
+  gender?: string | null;
+  addressLine?: string | null;
   city?: string | null;
   district?: string | null;
   state?: string | null;
-  isMobileVerified: boolean;
-  status: string;
+  country?: string | null;
+  pincode?: string | null;
+  isMobileVerified?: boolean;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
   lastLoginAt?: string | null;
 };
