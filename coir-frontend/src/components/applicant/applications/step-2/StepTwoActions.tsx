@@ -8,35 +8,58 @@ import {
   saveApplicationDetails,
 } from "@/services/application.service";
 
+import { getApiErrorMessage } from "@/lib/error";
+
+import {
+  hasValidationErrors,
+  validateBankDetails,
+  validateExperienceDetails,
+  validateStepTwoDocuments,
+  type BankDetailsValues,
+  type ExperienceDetailsValues,
+  type StepTwoDocumentsValues,
+  type ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
+
 type Props = {
   applicationId: number;
 
   trainingCentreId:
     number | null;
 
-  experience: {
-    employerName: string;
-    natureOfWork: string;
-    dateOfJoining: string;
-    totalExperience: string;
-  };
+  experience: ExperienceDetailsValues;
 
-  bankDetails: {
-    bankName: string;
-    accountHolderName: string;
-    accountNumber: string;
-    ifscCode: string;
-  };
+  setExperienceErrors: React.Dispatch<
+    React.SetStateAction<ValidationErrors<ExperienceDetailsValues>>
+  >;
 
-  documents: any;
+  bankDetails: BankDetailsValues;
+
+  setBankErrors: React.Dispatch<
+    React.SetStateAction<ValidationErrors<BankDetailsValues>>
+  >;
+
+  documents: StepTwoDocumentsValues;
+
+  setDocumentErrors: React.Dispatch<
+    React.SetStateAction<ValidationErrors<StepTwoDocumentsValues>>
+  >;
+
+  setTrainingCentreError: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
 };
 
 export function StepTwoActions({
   applicationId,
   trainingCentreId,
   experience,
+  setExperienceErrors,
   bankDetails,
+  setBankErrors,
   documents,
+  setDocumentErrors,
+  setTrainingCentreError,
 }: Props) {
   const router = useRouter();
 
@@ -49,7 +72,56 @@ export function StepTwoActions({
     );
   }
 
+  function validateBeforeSave() {
+    const experienceErrors =
+      validateExperienceDetails(
+        experience,
+      );
+    const bankErrors =
+      validateBankDetails(
+        bankDetails,
+      );
+    const documentErrors =
+      validateStepTwoDocuments(
+        documents,
+      );
+    const trainingError =
+      trainingCentreId
+        ? undefined
+        : "Training centre is required";
+
+    setExperienceErrors(
+      experienceErrors,
+    );
+    setBankErrors(bankErrors);
+    setDocumentErrors(
+      documentErrors,
+    );
+    setTrainingCentreError(
+      trainingError,
+    );
+
+    if (
+      hasValidationErrors(experienceErrors) ||
+      hasValidationErrors(bankErrors) ||
+      hasValidationErrors(documentErrors) ||
+      trainingError
+    ) {
+      alert(
+        "Please correct the highlighted fields.",
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   async function handleSaveDraft() {
+    if (!validateBeforeSave()) {
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -76,7 +148,10 @@ export function StepTwoActions({
       console.error(error);
 
       alert(
-        "Failed to save draft",
+        getApiErrorMessage(
+          error,
+          "Failed to save draft",
+        ),
       );
     } finally {
       setLoading(false);
@@ -84,6 +159,10 @@ export function StepTwoActions({
   }
 
   async function handlePreview() {
+    if (!validateBeforeSave()) {
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -110,7 +189,10 @@ export function StepTwoActions({
       console.error(error);
 
       alert(
-        "Failed to save data",
+        getApiErrorMessage(
+          error,
+          "Failed to save data",
+        ),
       );
     } finally {
       setLoading(false);

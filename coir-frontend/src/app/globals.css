@@ -3964,10 +3964,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .form-field--full {
   grid-column: 1 / -1;
+}
+
+.form-field--wide {
+  grid-column: span 2;
 }
 
 .form-field label {
@@ -3982,6 +3987,9 @@ body {
 .form-field select,
 .form-field textarea {
   width: 100%;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
 
   padding: 14px 16px;
 
@@ -3995,9 +4003,53 @@ body {
 
 }
 
+.form-field input[aria-invalid="true"],
+.form-field select[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+  border-color: #c7372f;
+  background: #fff8f7;
+}
+
+.form-field__error {
+  margin: -2px 0 0;
+  color: #c7372f;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.photo-upload-error,
+.document-upload-card__error {
+  color: #c7372f;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.document-upload-card__error {
+  margin-top: 10px;
+  text-align: center;
+}
+
 .form-field textarea {
   height: 100px;
   padding-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field--wide {
+    grid-column: 1 / -1;
+  }
 }
 
 .application-progress {

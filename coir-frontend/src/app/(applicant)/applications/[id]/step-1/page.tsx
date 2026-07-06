@@ -21,6 +21,11 @@ import {
 
 import { StepOneActions } from "@/components/applicant/applications/step-1/StepOneActions";
 
+import type {
+  StepOneDocumentsValues,
+  ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
+
 import {
   getApplication,
 } from "@/services/application.service";
@@ -50,8 +55,13 @@ export default function StepOnePage() {
       country: "India",
     });
 
+  const [formErrors, setFormErrors] =
+    useState<ValidationErrors<PersonalDetails>>(
+      {},
+    );
+
   const [documents, setDocuments] =
-    useState({
+    useState<StepOneDocumentsValues>({
       photo: "",
       aadhaar: "",
       pan: "",
@@ -60,6 +70,11 @@ export default function StepOnePage() {
       graduationCertificate: "",
       casteCertificate: "",
     });
+
+  const [documentErrors, setDocumentErrors] =
+    useState<ValidationErrors<StepOneDocumentsValues>>(
+      {},
+    );
 
   useEffect(() => {
     async function fetchApplication() {
@@ -133,6 +148,12 @@ export default function StepOnePage() {
           documents={
             documents
           }
+          errors={
+            documentErrors
+          }
+          setErrors={
+            setDocumentErrors
+          }
           setDocuments={
             setDocuments
           }
@@ -144,6 +165,18 @@ export default function StepOnePage() {
           }
           setFormData={
             setFormData
+          }
+          errors={
+            formErrors
+          }
+          setErrors={
+            setFormErrors
+          }
+          documentErrors={
+            documentErrors
+          }
+          setDocumentErrors={
+            setDocumentErrors
           }
           documents={
             documents
@@ -162,6 +195,12 @@ export default function StepOnePage() {
           }
           applicationId={
             applicationId
+          }
+          setErrors={
+            setFormErrors
+          }
+          setDocumentErrors={
+            setDocumentErrors
           }
         />
       </ApplicationLayout>

@@ -20,6 +20,12 @@ type TrainingCentre = {
 type Props = {
   trainingCentreId: number | null;
 
+  error?: string;
+
+  setError?: (
+    error: string | undefined,
+  ) => void;
+
   setTrainingCentreId: (
     id: number,
   ) => void;
@@ -27,6 +33,8 @@ type Props = {
 
 export function TrainingCentreSection({
   trainingCentreId,
+  error,
+  setError,
   setTrainingCentreId,
 }: Props) {
   const [centres, setCentres] =
@@ -62,19 +70,26 @@ export function TrainingCentreSection({
         <div className="training-centre__field">
 
           <label>
-            Select Training Centre
+            Select Training Centre{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <select
             value={
               trainingCentreId ?? ""
             }
-            onChange={(e) =>
+            onChange={(e) => {
               setTrainingCentreId(
                 Number(
                   e.target.value,
                 ),
-              )
+              );
+              setError?.(undefined);
+            }}
+            aria-invalid={
+              Boolean(error)
             }
           >
             <option value="">
@@ -93,6 +108,12 @@ export function TrainingCentreSection({
               ),
             )}
           </select>
+
+          {error ? (
+            <p className="form-field__error">
+              {error}
+            </p>
+          ) : null}
 
         </div>
 

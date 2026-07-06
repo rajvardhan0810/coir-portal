@@ -4,21 +4,22 @@ import {
   uploadFile,
 } from "@/services/application.service";
 
-type Documents = {
-  photo: string;
-  aadhaar: string;
-  pan: string;
-  tenthMarksheet: string;
-  twelfthMarksheet: string;
-  graduationCertificate: string;
-  casteCertificate: string;
-};
+import type {
+  StepOneDocumentsValues,
+  ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
 
 type Props = {
-  documents: Documents;
+  documents: StepOneDocumentsValues;
+
+  errors?: ValidationErrors<StepOneDocumentsValues>;
+
+  setErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<StepOneDocumentsValues>>
+  >;
 
   setDocuments: React.Dispatch<
-    React.SetStateAction<Documents>
+    React.SetStateAction<StepOneDocumentsValues>
   >;
 };
 
@@ -59,11 +60,13 @@ const requiredDocuments = [
 
 export function DocumentsUploadSection({
   documents,
+  errors = {},
+  setErrors,
   setDocuments,
 }: Props) {
   async function handleUpload(
     file: File,
-    field: keyof Documents,
+    field: keyof StepOneDocumentsValues,
   ) {
     try {
       const response =
@@ -73,6 +76,12 @@ export function DocumentsUploadSection({
         ...prev,
         [field]:
           response.url,
+      }));
+
+      setErrors?.((prev) => ({
+        ...prev,
+        [field]:
+          undefined,
       }));
 
       alert(
@@ -129,7 +138,10 @@ export function DocumentsUploadSection({
               />
 
               <h4>
-                {document.title}
+                {document.title}{" "}
+                <span className="required">
+                  *
+                </span>
               </h4>
 
               <span className="document-upload-card__hint">
@@ -147,6 +159,12 @@ export function DocumentsUploadSection({
                   Click to Upload
                 </span>
               )}
+
+              {errors[document.key] ? (
+                <span className="document-upload-card__error">
+                  {errors[document.key]}
+                </span>
+              ) : null}
             </label>
           ),
         )}

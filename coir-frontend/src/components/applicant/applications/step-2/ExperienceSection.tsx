@@ -1,23 +1,55 @@
 "use client";
 
+import {
+  validateExperienceDetails,
+  type ExperienceDetailsValues,
+  type ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
+
 type Props = {
-  experience: {
-    employerName: string;
-    natureOfWork: string;
-    dateOfJoining: string;
-    totalExperience: string;
-  };
+  experience: ExperienceDetailsValues;
+
+  errors?: ValidationErrors<ExperienceDetailsValues>;
+
+  setErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<ExperienceDetailsValues>>
+  >;
 
   onChange: (
-    field: string,
+    field: keyof ExperienceDetailsValues,
     value: string,
   ) => void;
 };
 
 export function ExperienceSection({
   experience,
+  errors = {},
+  setErrors,
   onChange,
 }: Props) {
+  function handleChange(
+    field: keyof ExperienceDetailsValues,
+    value: string,
+  ) {
+    const nextExperience = {
+      ...experience,
+      [field]: value,
+    };
+
+    onChange(
+      field,
+      value,
+    );
+
+    setErrors?.((prev) => ({
+      ...prev,
+      [field]:
+        validateExperienceDetails(
+          nextExperience,
+        )[field],
+    }));
+  }
+
   return (
     <section className="application-card">
 
@@ -31,7 +63,10 @@ export function ExperienceSection({
 
         <div className="form-field">
           <label>
-            Name of Employer
+            Name of Employer{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -40,17 +75,29 @@ export function ExperienceSection({
               experience.employerName
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "employerName",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.employerName)
+            }
           />
+
+          {errors.employerName ? (
+            <p className="form-field__error">
+              {errors.employerName}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Nature of Work
+            Nature of Work{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -59,17 +106,29 @@ export function ExperienceSection({
               experience.natureOfWork
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "natureOfWork",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.natureOfWork)
+            }
           />
+
+          {errors.natureOfWork ? (
+            <p className="form-field__error">
+              {errors.natureOfWork}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Date of Joining
+            Date of Joining{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -78,17 +137,29 @@ export function ExperienceSection({
               experience.dateOfJoining
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "dateOfJoining",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.dateOfJoining)
+            }
           />
+
+          {errors.dateOfJoining ? (
+            <p className="form-field__error">
+              {errors.dateOfJoining}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Total Experience (Years)
+            Total Experience (Years){" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -97,12 +168,22 @@ export function ExperienceSection({
               experience.totalExperience
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "totalExperience",
                 e.target.value,
               )
             }
+            min={0}
+            aria-invalid={
+              Boolean(errors.totalExperience)
+            }
           />
+
+          {errors.totalExperience ? (
+            <p className="form-field__error">
+              {errors.totalExperience}
+            </p>
+          ) : null}
         </div>
 
       </div>

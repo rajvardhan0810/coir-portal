@@ -28,6 +28,13 @@ from "@/components/applicant/applications/step-2/UploadDocumentsSection";
 import { StepTwoActions }
 from "@/components/applicant/applications/step-2/StepTwoActions";
 
+import type {
+  BankDetailsValues,
+  ExperienceDetailsValues,
+  StepTwoDocumentsValues,
+  ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
+
 export default function StepTwoPage() {
   const params = useParams();
 
@@ -43,15 +50,27 @@ export default function StepTwoPage() {
   );
 
   const [experience, setExperience] =
-    useState({
+    useState<ExperienceDetailsValues>({
       employerName: "",
       natureOfWork: "",
       dateOfJoining: "",
       totalExperience: "",
     });
 
+  const [experienceErrors, setExperienceErrors] =
+    useState<ValidationErrors<ExperienceDetailsValues>>(
+      {},
+    );
+
+  const [
+    trainingCentreError,
+    setTrainingCentreError,
+  ] = useState<string | undefined>(
+    undefined,
+  );
+
   const [bankDetails, setBankDetails] =
-    useState({
+    useState<BankDetailsValues>({
       aadhaarNumber: "",
       panNumber: "",
       tenthMarks: "",
@@ -62,12 +81,22 @@ export default function StepTwoPage() {
       ifscCode: "",
     });
 
+  const [bankErrors, setBankErrors] =
+    useState<ValidationErrors<BankDetailsValues>>(
+      {},
+    );
+
   // ✅ Sirf 2 documents
   const [documents, setDocuments] =
-    useState({
+    useState<StepTwoDocumentsValues>({
       cancelCheque: "",
       experienceLetter: "",
     });
+
+  const [documentErrors, setDocumentErrors] =
+    useState<ValidationErrors<StepTwoDocumentsValues>>(
+      {},
+    );
 
   return (
     <ApplicationShell>
@@ -91,6 +120,12 @@ export default function StepTwoPage() {
 
         <ExperienceSection
           experience={experience}
+          errors={
+            experienceErrors
+          }
+          setErrors={
+            setExperienceErrors
+          }
           onChange={(
             field,
             value,
@@ -108,6 +143,12 @@ export default function StepTwoPage() {
           trainingCentreId={
             trainingCentreId
           }
+          error={
+            trainingCentreError
+          }
+          setError={
+            setTrainingCentreError
+          }
           setTrainingCentreId={
             setTrainingCentreId
           }
@@ -116,6 +157,12 @@ export default function StepTwoPage() {
         <BankDetailsSection
           bankDetails={
             bankDetails
+          }
+          errors={
+            bankErrors
+          }
+          setErrors={
+            setBankErrors
           }
           onChange={(
             field,
@@ -135,6 +182,12 @@ export default function StepTwoPage() {
           documents={
             documents
           }
+          errors={
+            documentErrors
+          }
+          setErrors={
+            setDocumentErrors
+          }
           setDocuments={
             setDocuments
           }
@@ -150,11 +203,23 @@ export default function StepTwoPage() {
           experience={
             experience
           }
+          setExperienceErrors={
+            setExperienceErrors
+          }
           bankDetails={
             bankDetails
           }
+          setBankErrors={
+            setBankErrors
+          }
           documents={
             documents
+          }
+          setDocumentErrors={
+            setDocumentErrors
+          }
+          setTrainingCentreError={
+            setTrainingCentreError
           }
         />
 

@@ -12,35 +12,78 @@ import {
   saveApplicationDetails,
 } from "@/services/application.service";
 
-type Documents = {
-  photo: string;
-  aadhaar: string;
-  pan: string;
-  tenthMarksheet: string;
-  twelfthMarksheet: string;
-  graduationCertificate: string;
-  casteCertificate: string;
-};
+import { getApiErrorMessage } from "@/lib/error";
+
+import {
+  hasValidationErrors,
+  validateStepOneDocuments,
+  validatePersonalDetails,
+  type StepOneDocumentsValues,
+  type ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
 
 type Props = {
   formData: PersonalDetails;
 
-  documents: Documents;
+  documents: StepOneDocumentsValues;
 
   applicationId: number;
+
+  setErrors: React.Dispatch<
+    React.SetStateAction<ValidationErrors<PersonalDetails>>
+  >;
+
+  setDocumentErrors: React.Dispatch<
+    React.SetStateAction<ValidationErrors<StepOneDocumentsValues>>
+  >;
 };
 
 export function StepOneActions({
   formData,
   documents,
   applicationId,
+  setErrors,
+  setDocumentErrors,
 }: Props) {
   const router = useRouter();
 
   const [loading, setLoading] =
     useState(false);
 
+  function validateBeforeSave() {
+    const errors =
+      validatePersonalDetails(
+        formData,
+      );
+    const documentErrors =
+      validateStepOneDocuments(
+        documents,
+      );
+
+    setErrors(errors);
+    setDocumentErrors(
+      documentErrors,
+    );
+
+    if (
+      hasValidationErrors(errors) ||
+      hasValidationErrors(documentErrors)
+    ) {
+      alert(
+        "Please correct the highlighted fields.",
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   async function handleSaveDraft() {
+    if (!validateBeforeSave()) {
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -63,7 +106,10 @@ export function StepOneActions({
       console.error(error);
 
       alert(
-        "Failed to save draft",
+        getApiErrorMessage(
+          error,
+          "Failed to save draft",
+        ),
       );
     } finally {
       setLoading(false);
@@ -71,6 +117,10 @@ export function StepOneActions({
   }
 
   async function handleNext() {
+    if (!validateBeforeSave()) {
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -93,7 +143,10 @@ export function StepOneActions({
       console.error(error);
 
       alert(
-        "Failed to save data",
+        getApiErrorMessage(
+          error,
+          "Failed to save data",
+        ),
       );
     } finally {
       setLoading(false);

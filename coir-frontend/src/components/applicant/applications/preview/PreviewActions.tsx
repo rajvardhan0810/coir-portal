@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { submitApplication } from "@/services/application.service";
+import { getApiErrorMessage } from "@/lib/error";
 
 type Props = {
   applicationId: number;
@@ -66,7 +67,10 @@ export function PreviewActions({
       console.error(error);
 
       alert(
-        "Failed to submit application",
+        getApiErrorMessage(
+          error,
+          "Failed to submit application",
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -171,8 +175,8 @@ export function PreviewActions({
             </p>
 
             <strong>
-              "Diploma Course in Coir
-              Technology"
+              &quot;Diploma Course in Coir
+              Technology&quot;
             </strong>
 
             <button
@@ -219,8 +223,8 @@ export function PreviewActions({
             </p>
 
             <strong>
-              "Diploma Course in Coir
-              Technology"
+              &quot;Diploma Course in Coir
+              Technology&quot;
             </strong>
 
             <button

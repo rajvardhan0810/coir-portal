@@ -1,27 +1,62 @@
 "use client";
 
+import {
+  normalizeBankDetailsField,
+  validateBankDetails,
+  type BankDetailsValues,
+  type ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
+
 type Props = {
-  bankDetails: {
-    aadhaarNumber: string;
-    panNumber: string;
-    tenthMarks: string;
-    twelfthMarks: string;
-    bankName: string;
-    accountHolderName: string;
-    accountNumber: string;
-    ifscCode: string;
-  };
+  bankDetails: BankDetailsValues;
+
+  errors?: ValidationErrors<BankDetailsValues>;
+
+  setErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<BankDetailsValues>>
+  >;
 
   onChange: (
-    field: string,
+    field: keyof BankDetailsValues,
     value: string,
   ) => void;
 };
 
 export function BankDetailsSection({
   bankDetails,
+  errors = {},
+  setErrors,
   onChange,
 }: Props) {
+  function handleChange(
+    field: keyof BankDetailsValues,
+    value: string,
+  ) {
+    const nextValue =
+      normalizeBankDetailsField(
+        field,
+        value,
+      );
+
+    const nextBankDetails = {
+      ...bankDetails,
+      [field]: nextValue,
+    };
+
+    onChange(
+      field,
+      nextValue,
+    );
+
+    setErrors?.((prev) => ({
+      ...prev,
+      [field]:
+        validateBankDetails(
+          nextBankDetails,
+        )[field],
+    }));
+  }
+
   return (
     <section className="application-card">
 
@@ -35,83 +70,139 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            Aadhaar Number
+            Aadhaar Number{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            inputMode="numeric"
+            maxLength={12}
             value={
               bankDetails.aadhaarNumber
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "aadhaarNumber",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.aadhaarNumber)
+            }
           />
+
+          {errors.aadhaarNumber ? (
+            <p className="form-field__error">
+              {errors.aadhaarNumber}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            PAN Card Number
+            PAN Card Number{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            maxLength={10}
             value={
               bankDetails.panNumber
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "panNumber",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.panNumber)
+            }
           />
+
+          {errors.panNumber ? (
+            <p className="form-field__error">
+              {errors.panNumber}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            10th Std Marks
+            10th Std Marks{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            inputMode="decimal"
             value={
               bankDetails.tenthMarks
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "tenthMarks",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.tenthMarks)
+            }
           />
+
+          {errors.tenthMarks ? (
+            <p className="form-field__error">
+              {errors.tenthMarks}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            12th Std Marks
+            12th Std Marks{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            inputMode="decimal"
             value={
               bankDetails.twelfthMarks
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "twelfthMarks",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.twelfthMarks)
+            }
           />
+
+          {errors.twelfthMarks ? (
+            <p className="form-field__error">
+              {errors.twelfthMarks}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Bank Name
+            Bank Name{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -120,17 +211,29 @@ export function BankDetailsSection({
               bankDetails.bankName
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "bankName",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.bankName)
+            }
           />
+
+          {errors.bankName ? (
+            <p className="form-field__error">
+              {errors.bankName}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Account Holder Name
+            Account Holder Name{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
@@ -139,50 +242,86 @@ export function BankDetailsSection({
               bankDetails.accountHolderName
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "accountHolderName",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.accountHolderName)
+            }
           />
+
+          {errors.accountHolderName ? (
+            <p className="form-field__error">
+              {errors.accountHolderName}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            Account Number
+            Account Number{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            inputMode="numeric"
+            maxLength={18}
             value={
               bankDetails.accountNumber
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "accountNumber",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.accountNumber)
+            }
           />
+
+          {errors.accountNumber ? (
+            <p className="form-field__error">
+              {errors.accountNumber}
+            </p>
+          ) : null}
         </div>
 
         <div className="form-field">
           <label>
-            IFSC Code
+            IFSC Code{" "}
+            <span className="required">
+              *
+            </span>
           </label>
 
           <input
             type="text"
+            maxLength={11}
             value={
               bankDetails.ifscCode
             }
             onChange={(e) =>
-              onChange(
+              handleChange(
                 "ifscCode",
                 e.target.value,
               )
             }
+            aria-invalid={
+              Boolean(errors.ifscCode)
+            }
           />
+
+          {errors.ifscCode ? (
+            <p className="form-field__error">
+              {errors.ifscCode}
+            </p>
+          ) : null}
         </div>
 
       </div>

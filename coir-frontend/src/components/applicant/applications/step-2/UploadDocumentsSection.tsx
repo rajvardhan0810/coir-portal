@@ -4,21 +4,27 @@ import {
   uploadFile,
 } from "@/services/application.service";
 
-type Documents = {
-  cancelCheque: string;
-  experienceLetter: string;
-};
+import type {
+  StepTwoDocumentsValues,
+  ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
 
 type Props = {
-  documents: Documents;
+  documents: StepTwoDocumentsValues;
+
+  errors?: ValidationErrors<StepTwoDocumentsValues>;
+
+  setErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<StepTwoDocumentsValues>>
+  >;
 
   setDocuments: React.Dispatch<
-    React.SetStateAction<Documents>
+    React.SetStateAction<StepTwoDocumentsValues>
   >;
 };
 
 const documentFields: {
-  key: keyof Documents;
+  key: keyof StepTwoDocumentsValues;
   label: string;
 }[] = [
   {
@@ -34,11 +40,13 @@ const documentFields: {
 
 export function UploadDocumentsSection({
   documents,
+  errors = {},
+  setErrors,
   setDocuments,
 }: Props) {
   async function handleUpload(
     file: File,
-    field: keyof Documents,
+    field: keyof StepTwoDocumentsValues,
   ) {
     try {
       const response =
@@ -48,6 +56,12 @@ export function UploadDocumentsSection({
         ...prev,
         [field]:
           response.url,
+      }));
+
+      setErrors?.((prev) => ({
+        ...prev,
+        [field]:
+          undefined,
       }));
 
       alert(
@@ -80,7 +94,10 @@ export function UploadDocumentsSection({
               className="upload-item"
             >
               <label className="upload-label">
-                {document.label}
+                {document.label}{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <div className="upload-wrapper">
@@ -119,6 +136,12 @@ export function UploadDocumentsSection({
                 </label>
 
               </div>
+
+              {errors[document.key] ? (
+                <p className="form-field__error">
+                  {errors[document.key]}
+                </p>
+              ) : null}
 
             </div>
           ),

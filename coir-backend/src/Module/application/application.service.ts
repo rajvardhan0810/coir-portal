@@ -1,4 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -7,6 +10,289 @@ export class ApplicationService {
   constructor(
     private readonly prisma: PrismaService,
   ) {}
+
+  private readonly mobilePattern = /^[6-9]\d{9}$/;
+
+  private readonly emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  private readonly pincodePattern = /^\d{6}$/;
+
+  private readonly panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+
+  private readonly ifscPattern = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+
+  private readonly accountNumberPattern = /^\d{9,18}$/;
+
+  private getText(
+    value: unknown,
+  ) {
+    return typeof value === 'string'
+      ? value.trim()
+      : '';
+  }
+
+  private isValidAadhaarNumber(
+    value: string,
+  ) {
+    return /^[2-9]\d{11}$/.test(value);
+  }
+
+  private assertValidPersonalDetails(
+    personalDetails: any,
+  ) {
+    const fullName =
+      this.getText(personalDetails?.fullName);
+    const dob =
+      this.getText(personalDetails?.dob);
+    const fatherName =
+      this.getText(personalDetails?.fatherName);
+    const gender =
+      this.getText(personalDetails?.gender);
+    const caste =
+      this.getText(personalDetails?.caste);
+    const mobile =
+      this.getText(personalDetails?.mobile);
+    const email =
+      this.getText(personalDetails?.email);
+    const address =
+      this.getText(personalDetails?.address);
+    const city =
+      this.getText(personalDetails?.city);
+    const state =
+      this.getText(personalDetails?.state);
+    const pincode =
+      this.getText(personalDetails?.pincode);
+    const country =
+      this.getText(personalDetails?.country);
+
+    if (!fullName) {
+      throw new BadRequestException(
+        'Full name is required',
+      );
+    }
+
+    if (!dob) {
+      throw new BadRequestException(
+        'Date of birth is required',
+      );
+    }
+
+    if (!fatherName) {
+      throw new BadRequestException(
+        'Father / husband name is required',
+      );
+    }
+
+    if (!gender) {
+      throw new BadRequestException(
+        'Gender is required',
+      );
+    }
+
+    if (!caste) {
+      throw new BadRequestException(
+        'Caste is required',
+      );
+    }
+
+    if (!this.mobilePattern.test(mobile)) {
+      throw new BadRequestException(
+        'Invalid mobile number',
+      );
+    }
+
+    if (!this.emailPattern.test(email)) {
+      throw new BadRequestException(
+        'Invalid email address',
+      );
+    }
+
+    if (!address) {
+      throw new BadRequestException(
+        'Address is required',
+      );
+    }
+
+    if (!city) {
+      throw new BadRequestException(
+        'City is required',
+      );
+    }
+
+    if (!state) {
+      throw new BadRequestException(
+        'State is required',
+      );
+    }
+
+    if (!this.pincodePattern.test(pincode)) {
+      throw new BadRequestException(
+        'Invalid pincode',
+      );
+    }
+
+    if (!country) {
+      throw new BadRequestException(
+        'Country is required',
+      );
+    }
+  }
+
+  private assertValidBankDetails(
+    bankDetails: any,
+  ) {
+    const aadhaarNumber =
+      this.getText(bankDetails?.aadhaarNumber);
+    const panNumber =
+      this.getText(bankDetails?.panNumber).toUpperCase();
+    const tenthMarks =
+      Number(this.getText(bankDetails?.tenthMarks));
+    const twelfthMarks =
+      Number(this.getText(bankDetails?.twelfthMarks));
+    const bankName =
+      this.getText(bankDetails?.bankName);
+    const accountHolderName =
+      this.getText(bankDetails?.accountHolderName);
+    const accountNumber =
+      this.getText(bankDetails?.accountNumber);
+    const ifscCode =
+      this.getText(bankDetails?.ifscCode).toUpperCase();
+
+    if (!this.isValidAadhaarNumber(aadhaarNumber)) {
+      throw new BadRequestException(
+        'Invalid Aadhaar number',
+      );
+    }
+
+    if (!this.panPattern.test(panNumber)) {
+      throw new BadRequestException(
+        'Invalid PAN number',
+      );
+    }
+
+    if (
+      Number.isNaN(tenthMarks) ||
+      tenthMarks < 0 ||
+      tenthMarks > 100
+    ) {
+      throw new BadRequestException(
+        'Valid 10th marks are required',
+      );
+    }
+
+    if (
+      Number.isNaN(twelfthMarks) ||
+      twelfthMarks < 0 ||
+      twelfthMarks > 100
+    ) {
+      throw new BadRequestException(
+        'Valid 12th marks are required',
+      );
+    }
+
+    if (!bankName) {
+      throw new BadRequestException(
+        'Bank name is required',
+      );
+    }
+
+    if (!accountHolderName) {
+      throw new BadRequestException(
+        'Account holder name is required',
+      );
+    }
+
+    if (!this.accountNumberPattern.test(accountNumber)) {
+      throw new BadRequestException(
+        'Invalid account number',
+      );
+    }
+
+    if (!this.ifscPattern.test(ifscCode)) {
+      throw new BadRequestException(
+        'Invalid IFSC code',
+      );
+    }
+  }
+
+  private assertValidExperienceDetails(
+    experienceDetails: any,
+  ) {
+    const employerName =
+      this.getText(experienceDetails?.employerName);
+    const natureOfWork =
+      this.getText(experienceDetails?.natureOfWork);
+    const dateOfJoining =
+      this.getText(experienceDetails?.dateOfJoining);
+    const totalExperienceValue =
+      this.getText(experienceDetails?.totalExperience);
+    const totalExperience =
+      Number(totalExperienceValue);
+
+    if (!employerName) {
+      throw new BadRequestException(
+        'Employer name is required',
+      );
+    }
+
+    if (!natureOfWork) {
+      throw new BadRequestException(
+        'Nature of work is required',
+      );
+    }
+
+    if (!dateOfJoining) {
+      throw new BadRequestException(
+        'Date of joining is required',
+      );
+    }
+
+    if (
+      !totalExperienceValue ||
+      Number.isNaN(totalExperience) ||
+      totalExperience < 0
+    ) {
+      throw new BadRequestException(
+        'Valid total experience is required',
+      );
+    }
+  }
+
+  private assertValidStepOneDocuments(
+    documents: any,
+  ) {
+    const requiredDocuments = [
+      ['photo', 'Photo is required'],
+      ['aadhaar', 'Aadhaar document is required'],
+      ['pan', 'PAN document is required'],
+      ['tenthMarksheet', '10th marksheet is required'],
+      ['twelfthMarksheet', '12th marksheet is required'],
+      ['graduationCertificate', 'Graduation marksheet is required'],
+      ['casteCertificate', 'Caste certificate is required'],
+    ];
+
+    for (const [field, message] of requiredDocuments) {
+      if (!this.getText(documents?.[field])) {
+        throw new BadRequestException(message);
+      }
+    }
+  }
+
+  private assertValidStepTwoDocuments(
+    documents: any,
+  ) {
+    if (!this.getText(documents?.cancelCheque)) {
+      throw new BadRequestException(
+        'Cancel cheque is required',
+      );
+    }
+
+    if (!this.getText(documents?.experienceLetter)) {
+      throw new BadRequestException(
+        'Experience letter is required',
+      );
+    }
+  }
 
   async createDraft(
     userId: number,
@@ -71,6 +357,36 @@ export class ApplicationService {
     trainingCentreId?: number;
   },
 ) {
+  if (data.personalDetails) {
+    this.assertValidPersonalDetails(
+      data.personalDetails,
+    );
+    this.assertValidStepOneDocuments(
+      data.documents,
+    );
+  }
+
+  if (data.experienceDetails) {
+    this.assertValidExperienceDetails(
+      data.experienceDetails,
+    );
+  }
+
+  if (data.bankDetails) {
+    this.assertValidBankDetails(
+      data.bankDetails,
+    );
+    this.assertValidStepTwoDocuments(
+      data.documents,
+    );
+
+    if (!data.trainingCentreId) {
+      throw new BadRequestException(
+        'Training centre is required',
+      );
+    }
+  }
+
   const existingDetail =
     await this.prisma.applicationDetail.findUnique({
       where: {
@@ -177,6 +493,49 @@ export class ApplicationService {
   async submit(
     applicationId: number,
   ) {
+    const application =
+      await this.prisma.application.findUnique({
+        where: {
+          id: applicationId,
+        },
+
+        include: {
+          detail: true,
+        },
+      });
+
+    if (!application?.detail) {
+      throw new BadRequestException(
+        'Application details are required',
+      );
+    }
+
+    this.assertValidPersonalDetails(
+      application.detail.personalDetails,
+    );
+
+    this.assertValidStepOneDocuments(
+      application.detail.documents,
+    );
+
+    this.assertValidExperienceDetails(
+      application.detail.experienceDetails,
+    );
+
+    this.assertValidBankDetails(
+      application.detail.bankDetails,
+    );
+
+    this.assertValidStepTwoDocuments(
+      application.detail.documents,
+    );
+
+    if (!application.trainingCentreId) {
+      throw new BadRequestException(
+        'Training centre is required',
+      );
+    }
+
     await this.prisma.application.update({
       where: {
         id: applicationId,

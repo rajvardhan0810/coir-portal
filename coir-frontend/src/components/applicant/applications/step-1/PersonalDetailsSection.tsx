@@ -1,14 +1,14 @@
 "use client";
 
-import { 
-  useEffect,
-  useState ,
-
-} from "react";
-
 import {
   uploadFile,
 } from "@/services/application.service";
+
+import {
+  validatePersonalDetails,
+  type StepOneDocumentsValues,
+  type ValidationErrors,
+} from "@/components/applicant/applications/validation/applicationValidation";
 
 export type PersonalDetails = {
   fullName: string;
@@ -34,37 +34,39 @@ type Props = {
     React.SetStateAction<PersonalDetails>
   >;
 
-  documents: {
-    photo: string;
-  };
+  errors?: ValidationErrors<PersonalDetails>;
 
-  setDocuments: React.Dispatch<any>;
+  setErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<PersonalDetails>>
+  >;
+
+  documentErrors?: ValidationErrors<StepOneDocumentsValues>;
+
+  setDocumentErrors?: React.Dispatch<
+    React.SetStateAction<ValidationErrors<StepOneDocumentsValues>>
+  >;
+
+  documents: StepOneDocumentsValues;
+
+  setDocuments: React.Dispatch<
+    React.SetStateAction<StepOneDocumentsValues>
+  >;
 };
 
 export function PersonalDetailsSection({
   formData,
   setFormData,
+  errors = {},
+  setErrors,
+  documentErrors = {},
+  setDocumentErrors,
   documents,
   setDocuments,
 }: Props) {
-  const [
-    photoPreview,
-    setPhotoPreview,
-  ] = useState<string | null>(
+  const photoPreview =
     documents.photo
       ? `http://localhost:4000${documents.photo}`
-      : null,
-  );
-
-  useEffect(() => {
-    if (documents.photo) {
-      setPhotoPreview(
-        `http://localhost:4000${documents.photo}`,
-      );
-    } else {
-      setPhotoPreview(null);
-    }
-  }, [documents.photo]);
+      : null;
 
   function handleChange(
     e: React.ChangeEvent<
@@ -76,9 +78,25 @@ export function PersonalDetailsSection({
     const { name, value } =
       e.target;
 
+    const field =
+      name as keyof PersonalDetails;
+
+    const nextFormData = {
+      ...formData,
+      [field]: value,
+    };
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [field]: value,
+    }));
+
+    setErrors?.((prev) => ({
+      ...prev,
+      [field]:
+        validatePersonalDetails(
+          nextFormData,
+        )[field],
     }));
   }
 
@@ -95,16 +113,18 @@ export function PersonalDetailsSection({
         await uploadFile(file);
 
       setDocuments(
-        (prev: any) => ({
+        (prev) => ({
           ...prev,
           photo:
             response.url,
         }),
       );
 
-      setPhotoPreview(
-        `http://localhost:4000${response.url}`,
-      );
+      setDocumentErrors?.((prev) => ({
+        ...prev,
+        photo:
+          undefined,
+      }));
 
       alert(
         "Photo uploaded successfully",
@@ -155,12 +175,21 @@ export function PersonalDetailsSection({
                   <i className="bx bx-image-add" />
 
                   <span>
-                    Upload Photo
+                    Upload Photo{" "}
+                    <span className="required">
+                      *
+                    </span>
                   </span>
                 </>
               )}
 
             </label>
+
+            {documentErrors.photo ? (
+              <p className="form-field__error photo-upload-error">
+                {documentErrors.photo}
+              </p>
+            ) : null}
 
           </div>
 
@@ -172,7 +201,10 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Full Name
+                Full Name{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -184,12 +216,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.fullName)
+                }
               />
+
+              {errors.fullName ? (
+                <p className="form-field__error">
+                  {errors.fullName}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Date of Birth
+                Date of Birth{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -201,12 +245,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.dob)
+                }
               />
+
+              {errors.dob ? (
+                <p className="form-field__error">
+                  {errors.dob}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Father / Husband Name
+                Father / Husband Name{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -218,12 +274,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.fatherName)
+                }
               />
+
+              {errors.fatherName ? (
+                <p className="form-field__error">
+                  {errors.fatherName}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Gender
+                Gender{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <select
@@ -233,6 +301,9 @@ export function PersonalDetailsSection({
                 }
                 onChange={
                   handleChange
+                }
+                aria-invalid={
+                  Boolean(errors.gender)
                 }
               >
                 <option value="">
@@ -252,11 +323,20 @@ export function PersonalDetailsSection({
                 </option>
 
               </select>
+
+              {errors.gender ? (
+                <p className="form-field__error">
+                  {errors.gender}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Caste
+                Caste{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -268,12 +348,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.caste)
+                }
               />
+
+              {errors.caste ? (
+                <p className="form-field__error">
+                  {errors.caste}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Mobile Number
+                Mobile Number{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -285,12 +377,26 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                inputMode="numeric"
+                maxLength={10}
+                aria-invalid={
+                  Boolean(errors.mobile)
+                }
               />
+
+              {errors.mobile ? (
+                <p className="form-field__error">
+                  {errors.mobile}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Email
+                Email{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -302,12 +408,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.email)
+                }
               />
+
+              {errors.email ? (
+                <p className="form-field__error">
+                  {errors.email}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field form-field--full">
               <label>
-                Address
+                Address{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <textarea
@@ -319,29 +437,58 @@ export function PersonalDetailsSection({
                   handleChange
                 }
                 rows={4}
+                aria-invalid={
+                  Boolean(errors.address)
+                }
               />
+
+              {errors.address ? (
+                <p className="form-field__error">
+                  {errors.address}
+                </p>
+              ) : null}
             </div>
 
-            <div className="form-field">
+            <div className="form-field form-field--wide">
               <label>
-                City
+                City{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
                 type="text"
                 name="city"
+                autoComplete="address-level2"
+                maxLength={80}
+                title={
+                  formData.city
+                }
                 value={
                   formData.city
                 }
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.city)
+                }
               />
+
+              {errors.city ? (
+                <p className="form-field__error">
+                  {errors.city}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                State
+                State{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -353,12 +500,24 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.state)
+                }
               />
+
+              {errors.state ? (
+                <p className="form-field__error">
+                  {errors.state}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Pincode
+                Pincode{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -370,12 +529,26 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                inputMode="numeric"
+                maxLength={6}
+                aria-invalid={
+                  Boolean(errors.pincode)
+                }
               />
+
+              {errors.pincode ? (
+                <p className="form-field__error">
+                  {errors.pincode}
+                </p>
+              ) : null}
             </div>
 
             <div className="form-field">
               <label>
-                Country
+                Country{" "}
+                <span className="required">
+                  *
+                </span>
               </label>
 
               <input
@@ -387,7 +560,16 @@ export function PersonalDetailsSection({
                 onChange={
                   handleChange
                 }
+                aria-invalid={
+                  Boolean(errors.country)
+                }
               />
+
+              {errors.country ? (
+                <p className="form-field__error">
+                  {errors.country}
+                </p>
+              ) : null}
             </div>
 
           </div>
