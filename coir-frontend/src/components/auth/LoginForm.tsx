@@ -209,17 +209,43 @@ export function LoginForm({
           <span>OR Login with</span>
         </div>
 
-        <button className="auth-digilocker" type="button" disabled>
-          <span className="auth-pehchaan">Meri Pehchaan</span>
-          <span>By</span>
-          <span className="auth-digi">DigiLocker</span>
-        </button>
+        {isBusinessUser ? (
+          <button className="auth-digilocker" type="button" disabled style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: "#ffffff", cursor: "not-allowed", border: "1px solid #cbd6e2", borderRadius: "8px" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <span style={{ background: "#ff7a00", color: "#ffffff", padding: "2px 6px", borderRadius: "4px", fontSize: "14px", fontWeight: "800" }}>Entity</span>
+              <span style={{ color: "#2d3748", fontWeight: "800", fontSize: "16px" }}>Locker</span>
+            </span>
+          </button>
+        ) : (
+          <button className="auth-digilocker" type="button" disabled>
+            <span className="auth-pehchaan">Meri Pehchaan</span>
+            <span>By</span>
+            <span className="auth-digi">DigiLocker</span>
+          </button>
+        )}
 
         <p className="auth-switch">
+          Don't have an account?{" "}
           <Link href={isBusinessUser ? ROUTES.businessRegister : ROUTES.register}>
-            New user registration
+            New Registration
           </Link>
         </p>
+
+        {isBusinessUser && (
+          <div style={{ textAlign: "center", marginTop: "18px", borderTop: "1px dashed #e2e8f0", paddingTop: "14px" }}>
+            <Link 
+              href="/business/showroom/dashboard" 
+              style={{ 
+                color: "var(--brand-dark)", 
+                fontWeight: "700", 
+                fontSize: "15px", 
+                textDecoration: "underline" 
+              }}
+            >
+              Showroom Login
+            </Link>
+          </div>
+        )}
 
         {message ? <p className="auth-message">{message}</p> : null}
       </form>
