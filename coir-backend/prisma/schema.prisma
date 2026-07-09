@@ -215,3 +215,102 @@ model ApplicationLog {
 
   application Application @relation(fields: [applicationId], references: [id])
 }
+
+// Showroom Procurement & Inventory Models
+
+model InventoryItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  sku         String   @unique
+  category    String
+  quantity    Int
+  unit        String
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  stockStatus String // "AVAILABLE", "LOW STOCK", "OUT OF STOCK"
+  supplier    String
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Supplier {
+  id           String             @id @default(uuid())
+  name         String
+  rating       Float
+  stars        Int
+  availability String // "IN STOCK", "LIMITED", "OUT OF STOCK"
+  stock        Int
+  fulfillment  String
+  base         Decimal            @db.Decimal(10, 2)
+  trans        Decimal            @db.Decimal(10, 2)
+  tax          Decimal            @db.Decimal(10, 2)
+  total        Decimal            @db.Decimal(10, 2)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  responses    SupplierResponse[]
+  allocations  OrderAllocation[]
+}
+
+model Demand {
+  id          String             @id
+  category    String
+  productName String
+  dateText    String
+  qty         String
+  status      String // "SUBMITTED", "RESPONDED", "ORDER RAISED", "ORDER PLACED"
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  responses   SupplierResponse[]
+  orders      Order[]
+}
+
+model SupplierResponse {
+  id         Int      @id @default(autoincrement())
+  demandId   String
+  supplierId String
+  base       Decimal  @db.Decimal(10, 2)
+  trans      Decimal  @db.Decimal(10, 2)
+  tax        Decimal  @db.Decimal(10, 2)
+  total      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  demand   Demand   @relation(fields: [demandId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([demandId, supplierId])
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  demandId    String   @unique
+  category    String
+  productName String
+  orderDate   String
+  totalQty    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  demand      Demand            @relation(fields: [demandId], references: [id], onDelete: Cascade)
+  allocations OrderAllocation[]
+}
+
+model OrderAllocation {
+  id           Int      @id @default(autoincrement())
+  orderId      Int
+  supplierId   String
+  supplierName String
+  rating       Float
+  stars        Int
+  allocatedQty String
+  fulfillment  String
+  base         Decimal  @db.Decimal(10, 2)
+  trans        Decimal  @db.Decimal(10, 2)
+  tax          Decimal  @db.Decimal(10, 2)
+  total        Decimal  @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+}

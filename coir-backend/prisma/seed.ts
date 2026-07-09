@@ -242,6 +242,227 @@ async function main() {
         "Training on export quality standards",
     },
   ]);
+
+  // SEED INVENTORY
+  const inventoryItems = [
+    {
+      name: "Premium Door Mat",
+      sku: "COIR-MAT-001",
+      category: "Mats & Rugs",
+      quantity: 142,
+      unit: "units",
+      unitPrice: 450.0,
+      stockStatus: "AVAILABLE",
+      supplier: "Kerala Coir Crafts",
+      image: "/assets/images/coir_door_mat.png",
+    },
+    {
+      name: "Raw Brown Fiber",
+      sku: "COIR-FIB-042",
+      category: "Coir Fiber",
+      quantity: 28,
+      unit: "kg",
+      unitPrice: 85.0,
+      stockStatus: "LOW STOCK",
+      supplier: "Alleppey Weaves",
+      image: "/assets/images/coir_fiber.png",
+    },
+    {
+      name: "3-Ply Coir Rope",
+      sku: "COIR-ROP-081",
+      category: "Coir Rope",
+      quantity: 0,
+      unit: "units",
+      unitPrice: 120.0,
+      stockStatus: "OUT OF STOCK",
+      supplier: "Malabar Co-op",
+      image: "/assets/images/coir_rope.png",
+    },
+    {
+      name: "Erosion Control Mesh",
+      sku: "COIR-GEO-210",
+      category: "Geotextiles",
+      quantity: 50,
+      unit: "rolls",
+      unitPrice: 2850.0,
+      stockStatus: "AVAILABLE",
+      supplier: "Southern Fibre Exporters",
+      image: "/assets/images/coir_geotextile_mesh.png",
+    },
+    {
+      name: "Rubberized Coir Pad",
+      sku: "COIR-PAD-105",
+      category: "Rubberized Mattresses",
+      quantity: 600,
+      unit: "units",
+      unitPrice: 350.0,
+      stockStatus: "AVAILABLE",
+      supplier: "Malabar Weaves Ltd",
+      image: "/assets/images/coir_fiber.png",
+    },
+    {
+      name: "Curled Coir",
+      sku: "COIR-FIB-012",
+      category: "Coir Fiber",
+      quantity: 110,
+      unit: "kg",
+      unitPrice: 84.0,
+      stockStatus: "LOW STOCK",
+      supplier: "Kerala Coir Crafts",
+      image: "/assets/images/coir_rope.png",
+    },
+  ];
+
+  for (const item of inventoryItems) {
+    await prisma.inventoryItem.upsert({
+      where: { sku: item.sku },
+      update: {},
+      create: item,
+    });
+  }
+
+  // SEED SUPPLIERS
+  const seedSuppliers = [
+    {
+      id: "sup-1",
+      name: "Kerala Coir Crafts",
+      rating: 4.8,
+      stars: 5,
+      availability: "IN STOCK",
+      stock: 3200,
+      fulfillment: "12 Days",
+      base: 150.0,
+      trans: 15.0,
+      tax: 20.0,
+      total: 185.0,
+    },
+    {
+      id: "sup-2",
+      name: "Alleppey Weaves",
+      rating: 4.2,
+      stars: 4,
+      availability: "IN STOCK",
+      stock: 1850,
+      fulfillment: "18 Days",
+      base: 145.0,
+      trans: 10.0,
+      tax: 17.0,
+      total: 172.0,
+    },
+    {
+      id: "sup-3",
+      name: "Malabar Co-op",
+      rating: 3.5,
+      stars: 3,
+      availability: "LIMITED",
+      stock: 400,
+      fulfillment: "25 Days",
+      base: 145.0,
+      trans: 10.0,
+      tax: 17.0,
+      total: 172.0,
+    },
+    {
+      id: "sup-4",
+      name: "Southern Fibre Exporters",
+      rating: 2.5,
+      stars: 3,
+      availability: "LIMITED",
+      stock: 100,
+      fulfillment: "28 Days",
+      base: 420.0,
+      trans: 45.0,
+      tax: 55.0,
+      total: 520.0,
+    },
+    {
+      id: "sup-5",
+      name: "Malabar Weaves Ltd",
+      rating: 2.0,
+      stars: 2,
+      availability: "LIMITED",
+      stock: 50,
+      fulfillment: "30 Days",
+      base: 380.0,
+      trans: 90.0,
+      tax: 45.0,
+      total: 515.0,
+    },
+  ];
+
+  for (const sup of seedSuppliers) {
+    await prisma.supplier.upsert({
+      where: { id: sup.id },
+      update: {},
+      create: sup,
+    });
+  }
+
+  // SEED DEMANDS
+  const seedDemands = [
+    {
+      id: "DEM-2026-089",
+      category: "Coir Geo-textile",
+      productName: "Coir Geo-textile",
+      dateText: "Raised 31 Mar, 2026",
+      qty: "5,000 m²",
+      status: "RESPONDED",
+    },
+    {
+      id: "DEM-2026-091",
+      category: "Premium Coir Pith",
+      productName: "Premium Coir Pith",
+      dateText: "Raised 30 Mar, 2026",
+      qty: "250 Units",
+      status: "SUBMITTED",
+    },
+    {
+      id: "DEM-2026-078",
+      category: "Rubberized Mattresses",
+      productName: "Rubberized Mattress",
+      dateText: "Raised 20 Mar, 2026",
+      qty: "1,200 Units",
+      status: "ORDER RAISED",
+    },
+    {
+      id: "DEM-2026-095",
+      category: "Curled Coir Rope",
+      productName: "Curled Coir Rope",
+      dateText: "Raised 29 Mar, 2026",
+      qty: "1,500 kg",
+      status: "SUBMITTED",
+    },
+  ];
+
+  for (const dem of seedDemands) {
+    await prisma.demand.upsert({
+      where: { id: dem.id },
+      update: {},
+      create: dem,
+    });
+  }
+
+  // SEED SUPPLIER RESPONSES
+  const seedResponses = [
+    { demandId: "DEM-2026-089", supplierId: "sup-1", base: 150.0, trans: 15.0, tax: 20.0, total: 185.0 },
+    { demandId: "DEM-2026-089", supplierId: "sup-2", base: 145.0, trans: 10.0, tax: 17.0, total: 172.0 },
+    { demandId: "DEM-2026-089", supplierId: "sup-3", base: 145.0, trans: 10.0, tax: 17.0, total: 172.0 },
+    { demandId: "DEM-2026-089", supplierId: "sup-4", base: 420.0, trans: 45.0, tax: 55.0, total: 520.0 },
+    { demandId: "DEM-2026-089", supplierId: "sup-5", base: 380.0, trans: 90.0, tax: 45.0, total: 515.0 },
+  ];
+
+  for (const resp of seedResponses) {
+    await prisma.supplierResponse.upsert({
+      where: {
+        demandId_supplierId: {
+          demandId: resp.demandId,
+          supplierId: resp.supplierId,
+        },
+      },
+      update: {},
+      create: resp,
+    });
+  }
   
   console.log("✅ Seed completed");
 }

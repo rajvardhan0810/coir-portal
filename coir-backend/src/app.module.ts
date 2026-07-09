@@ -15,6 +15,8 @@ import { ApplicationModule } from './Module/application/application.module';
 import { TrainingCentresModule } from './Module/training-centres/training-centres.module';
 import { UploadModule } from './Module/upload/upload.module';
 import { ProfileModule } from './Module/profile/profile.module';
+import { ShowroomModule } from './Module/showroom/showroom.module';
+import { BusinessModule } from './Module/business/business.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { ProfileModule } from './Module/profile/profile.module';
 
     UploadModule,
     ProfileModule,
+    ShowroomModule,
+    BusinessModule,
   ],
 
   controllers: [

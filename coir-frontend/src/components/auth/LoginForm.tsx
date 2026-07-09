@@ -234,7 +234,7 @@ export function LoginForm({
         {isBusinessUser && (
           <div style={{ textAlign: "center", marginTop: "18px", borderTop: "1px dashed #e2e8f0", paddingTop: "14px" }}>
             <Link 
-              href="/business/showroom/dashboard" 
+              href="/showroom/dashboard" 
               style={{ 
                 color: "var(--brand-dark)", 
                 fontWeight: "700", 
