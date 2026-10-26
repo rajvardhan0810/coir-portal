@@ -175,10 +175,7 @@ export function PersonalDetailsSection({
                   <i className="bx bx-image-add" />
 
                   <span>
-                    Upload Photo{" "}
-                    <span className="required">
-                      *
-                    </span>
+                    Upload Photo
                   </span>
                 </>
               )}
@@ -201,10 +198,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Full Name{" "}
-                <span className="required">
-                  *
-                </span>
+                Full Name
               </label>
 
               <input
@@ -230,10 +224,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Date of Birth{" "}
-                <span className="required">
-                  *
-                </span>
+                Date of Birth
               </label>
 
               <input
@@ -259,10 +250,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Father / Husband Name{" "}
-                <span className="required">
-                  *
-                </span>
+                Father / Husband Name
               </label>
 
               <input
@@ -288,10 +276,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Gender{" "}
-                <span className="required">
-                  *
-                </span>
+                Gender
               </label>
 
               <select
@@ -333,10 +318,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Caste{" "}
-                <span className="required">
-                  *
-                </span>
+                Caste
               </label>
 
               <input
@@ -362,10 +344,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Mobile Number{" "}
-                <span className="required">
-                  *
-                </span>
+                Mobile Number
               </label>
 
               <input
@@ -393,10 +372,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Email{" "}
-                <span className="required">
-                  *
-                </span>
+                Email
               </label>
 
               <input
@@ -422,10 +398,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field form-field--full">
               <label>
-                Address{" "}
-                <span className="required">
-                  *
-                </span>
+                Address
               </label>
 
               <textarea
@@ -451,10 +424,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field form-field--wide">
               <label>
-                City{" "}
-                <span className="required">
-                  *
-                </span>
+                City
               </label>
 
               <input
@@ -485,10 +455,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                State{" "}
-                <span className="required">
-                  *
-                </span>
+                State
               </label>
 
               <input
@@ -514,10 +481,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Pincode{" "}
-                <span className="required">
-                  *
-                </span>
+                Pincode
               </label>
 
               <input
@@ -545,10 +509,7 @@ export function PersonalDetailsSection({
 
             <div className="form-field">
               <label>
-                Country{" "}
-                <span className="required">
-                  *
-                </span>
+                Country
               </label>
 
               <input

@@ -76,6 +76,9 @@ export default function StepOnePage() {
       {},
     );
 
+  const [application, setApplication] =
+    useState<any>(null);
+
   useEffect(() => {
     async function fetchApplication() {
       try {

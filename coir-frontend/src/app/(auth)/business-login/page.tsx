@@ -5,7 +5,7 @@ export default function BusinessLoginPage() {
     <main className="auth-page">
       <LoginForm
         userType="BUSINESS"
-        defaultMobile="9625732059"
+        defaultEmail="supplier@coirboard.gov.in"
         defaultPassword="123456789"
       />
     </main>

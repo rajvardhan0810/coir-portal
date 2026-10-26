@@ -189,6 +189,7 @@ export default function ShowroomDashboardPage() {
     dateText: string;
     qty: string;
     status: "RESPONDED" | "SUBMITTED" | "ORDER RAISED" | "ORDER PLACED";
+    rawResponses?: any[];
   };
 
   const initialDemands: DemandItem[] = [
@@ -229,13 +230,41 @@ export default function ShowroomDashboardPage() {
   // Demand states
   const [demands, setDemands] = useState<DemandItem[]>([]);
   const [demandSearch, setDemandSearch] = useState("");
-  const [activeDemandId, setActiveDemandId] = useState("DEM-2026-089");
+  const [activeDemandId, setActiveDemandId] = useState("");
 
   // Popup overlay states
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showRespondedPopup, setShowRespondedPopup] = useState(false);
+  const [notifiedRespondedIds, setNotifiedRespondedIds] = useState<string[]>([]);
 
   const currentDashboardDemand = demands.find((d) => d.id === activeDemandId) || demands[0];
+
+  useEffect(() => {
+    if (
+      currentDashboardDemand?.status === "RESPONDED" &&
+      currentDashboardDemand?.id &&
+      !notifiedRespondedIds.includes(currentDashboardDemand.id)
+    ) {
+      setShowRespondedPopup(true);
+    }
+  }, [currentDashboardDemand?.id, currentDashboardDemand?.status, notifiedRespondedIds]);
+
+  const respondedSuppliers = suppliers.filter((s) => {
+    if (currentDashboardDemand?.status === "SUBMITTED") {
+      return false;
+    }
+    if (currentDashboardDemand?.rawResponses && currentDashboardDemand.rawResponses.length > 0) {
+      const submittedResponses = currentDashboardDemand.rawResponses.filter((r: any) => r.isSubmitted);
+      if (submittedResponses.length > 0) {
+        return submittedResponses.some((r: any) => r.supplierId === s.id);
+      }
+    }
+    if (currentDashboardDemand?.status === "RESPONDED") {
+      return s.id === "sup-1" || s.id === "sup-2";
+    }
+    return false;
+  });
 
   // Order Allocation view toggle state
   const [isAllocatingOrder, setIsAllocatingOrder] = useState(false);
@@ -284,8 +313,19 @@ export default function ShowroomDashboardPage() {
         dateText: d.dateText,
         qty: d.qty,
         status: d.status as any,
+        rawResponses: d.responses || [],
       }));
       setDemands(formattedDemands);
+
+      if (formattedDemands.length > 0) {
+        setActiveDemandId((prev: string) => {
+          if (!prev || prev === "DEM-2026-089" || !formattedDemands.some((fd: any) => fd.id === prev)) {
+            const pendingDemand = formattedDemands.find((fd: any) => fd.status !== "ORDER PLACED");
+            return pendingDemand ? pendingDemand.id : formattedDemands[0].id;
+          }
+          return prev;
+        });
+      }
 
       const orders = demandsData
         .filter((d: any) => d.status === "ORDER PLACED")
@@ -412,6 +452,16 @@ export default function ShowroomDashboardPage() {
   };
 
   const getSupplierPriceForDemand = (supplier: SupplierRow, demand: any) => {
+    // Check if supplier submitted an actual response in database
+    const resp = demand?.rawResponses?.find((r: any) => r.supplierId === supplier.id);
+    if (resp) {
+      const base = Math.round(parseFloat(resp.base) || 0);
+      const trans = Math.round(parseFloat(resp.trans) || 0);
+      const tax = Math.round(parseFloat(resp.tax) || 0);
+      const total = Math.round(parseFloat(resp.total) || (base + trans + tax));
+      return { base, trans, tax, total };
+    }
+
     // Determine a target price based on demand category
     let targetPrice = 450;
     const cat = (demand?.category || "").toLowerCase();
@@ -485,7 +535,8 @@ export default function ShowroomDashboardPage() {
   };
 
   const confirmSubmission = async () => {
-    const newIdText = `DEM-2026-0${96 + demands.length}`;
+    const randomNum = Math.floor(100 + Math.random() * 900);
+    const newIdText = `DEM-2026-${randomNum}`;
 
     const today = new Date();
     const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
@@ -509,8 +560,9 @@ export default function ShowroomDashboardPage() {
     };
 
     try {
-      await showroomService.createDemand(newDemand);
-      setActiveDemandId(newIdText);
+      const created = await showroomService.createDemand(newDemand);
+      const createdId = created?.id || newIdText;
+      setActiveDemandId(createdId);
       setShowConfirmPopup(false);
       setShowSuccessPopup(true);
       await refreshAllData();
@@ -620,10 +672,10 @@ export default function ShowroomDashboardPage() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedSupplierIds.length === suppliers.length) {
+    if (selectedSupplierIds.length === respondedSuppliers.length && respondedSuppliers.length > 0) {
       setSelectedSupplierIds([]);
     } else {
-      setSelectedSupplierIds(suppliers.map((s) => s.id));
+      setSelectedSupplierIds(respondedSuppliers.map((s) => s.id));
     }
   };
 
@@ -2493,7 +2545,14 @@ export default function ShowroomDashboardPage() {
                           </div>
                           <button
                             className="btn-solid-gold"
-                            style={{ padding: "8px 18px", fontSize: "13px" }}
+                            style={{
+                              padding: "8px 18px",
+                              fontSize: "13px",
+                              backgroundColor: currentDashboardDemand?.status === "SUBMITTED" ? "#cbd5e0" : "#b88f51",
+                              color: currentDashboardDemand?.status === "SUBMITTED" ? "#718096" : "#ffffff",
+                              cursor: currentDashboardDemand?.status === "SUBMITTED" ? "not-allowed" : "pointer"
+                            }}
+                            disabled={currentDashboardDemand?.status === "SUBMITTED"}
                             onClick={handlePlaceOrder}
                           >
                             Place Order
@@ -2508,7 +2567,7 @@ export default function ShowroomDashboardPage() {
                                 <th className="checkbox-container">
                                   <input
                                     type="checkbox"
-                                    checked={selectedSupplierIds.length === suppliers.length}
+                                    checked={respondedSuppliers.length > 0 && selectedSupplierIds.length === respondedSuppliers.length}
                                     onChange={toggleSelectAll}
                                     aria-label="Select all suppliers"
                                   />
@@ -2522,70 +2581,78 @@ export default function ShowroomDashboardPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {suppliers.map((s) => {
-                                const pricing = getSupplierPriceForDemand(s, currentDashboardDemand);
-                                return (
-                                  <tr key={s.id}>
-                                    <td className="checkbox-container">
-                                      <input
-                                        type="checkbox"
-                                        checked={selectedSupplierIds.includes(s.id)}
-                                        onChange={() => toggleSelect(s.id)}
-                                        aria-label={`Select ${s.name}`}
-                                      />
-                                    </td>
-                                    <td className="supplier-name-cell">{s.name}</td>
-                                    <td>
-                                      <div className="rating-stars">
-                                        <strong style={{ fontSize: "14px", fontWeight: "700" }}>{s.rating.toFixed(1)}/5</strong>
-                                        <span aria-hidden="true" style={{ fontSize: "13px" }}>
-                                          {Array.from({ length: 5 }).map((_, index) => (
-                                            <i
-                                              key={index}
-                                              className={`bx bxs-star ${index < s.stars ? "star-gold" : "star-grey"}`}
-                                              style={{ marginRight: "1px" }}
-                                            />
-                                          ))}
+                              {respondedSuppliers.length === 0 ? (
+                                <tr>
+                                  <td colSpan={7} style={{ textAlign: "center", padding: "28px", color: "#718096", fontSize: "15px", fontWeight: "600" }}>
+                                    No suppliers have responded to this demand yet. Responses submitted by suppliers from Business Login will appear here.
+                                  </td>
+                                </tr>
+                              ) : (
+                                respondedSuppliers.map((s) => {
+                                  const pricing = getSupplierPriceForDemand(s, currentDashboardDemand);
+                                  return (
+                                    <tr key={s.id}>
+                                      <td className="checkbox-container">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedSupplierIds.includes(s.id)}
+                                          onChange={() => toggleSelect(s.id)}
+                                          aria-label={`Select ${s.name}`}
+                                        />
+                                      </td>
+                                      <td className="supplier-name-cell">{s.name}</td>
+                                      <td>
+                                        <div className="rating-stars">
+                                          <strong style={{ fontSize: "14px", fontWeight: "700" }}>{s.rating.toFixed(1)}/5</strong>
+                                          <span aria-hidden="true" style={{ fontSize: "13px" }}>
+                                            {Array.from({ length: 5 }).map((_, index) => (
+                                              <i
+                                                key={index}
+                                                className={`bx bxs-star ${index < s.stars ? "star-gold" : "star-grey"}`}
+                                                style={{ marginRight: "1px" }}
+                                              />
+                                            ))}
+                                          </span>
+                                        </div>
+                                      </td>
+                                      <td>
+                                        <span className={`badge-availability ${s.availability.toLowerCase()}`}>
+                                          {s.availability}
                                         </span>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <span className={`badge-availability ${s.availability.toLowerCase()}`}>
-                                        {s.availability}
-                                      </span>
-                                    </td>
-                                    <td>{s.stock}</td>
-                                    <td>{s.fulfillment}</td>
-                                    <td>
-                                      <div className="price-breakup-grid">
-                                        <div className="price-breakup-item">
-                                          <span>BASE</span>
-                                          <strong>₹{pricing.base}</strong>
+                                      </td>
+                                      <td>{s.stock}</td>
+                                      <td>{s.fulfillment}</td>
+                                      <td>
+                                        <div className="price-breakup-grid">
+                                          <div className="price-breakup-item">
+                                            <span>BASE</span>
+                                            <strong>₹{pricing.base}</strong>
+                                          </div>
+                                          <div className="price-breakup-item">
+                                            <span>TRANS</span>
+                                            <strong>₹{pricing.trans}</strong>
+                                          </div>
+                                          <div className="price-breakup-item">
+                                            <span>TAX</span>
+                                            <strong>₹{pricing.tax}</strong>
+                                          </div>
+                                          <div className="price-breakup-total">
+                                            <span>TOTAL</span>
+                                            <strong>₹{pricing.total}</strong>
+                                          </div>
                                         </div>
-                                        <div className="price-breakup-item">
-                                          <span>TRANS</span>
-                                          <strong>₹{pricing.trans}</strong>
-                                        </div>
-                                        <div className="price-breakup-item">
-                                          <span>TAX</span>
-                                          <strong>₹{pricing.tax}</strong>
-                                        </div>
-                                        <div className="price-breakup-total">
-                                          <span>TOTAL</span>
-                                          <strong>₹{pricing.total}</strong>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
                             </tbody>
                           </table>
                         </div>
 
                         {/* Pagination strip matching screenshots */}
                         <div className="showroom-table-footer">
-                          <span className="showroom-footer-info">Showing 1 to 6</span>
+                          <span className="showroom-footer-info">Showing {respondedSuppliers.length} supplier response(s)</span>
                           <div className="showroom-pagination">
                             <button className="pagination-btn" aria-label="Previous page">
                               <i className="bx bx-chevron-left" />
@@ -3504,8 +3571,8 @@ export default function ShowroomDashboardPage() {
             </div>
             <h2 className="alert-title">Successful</h2>
             <p className="alert-text">
-              Product Demand has been <br />
-              submitted Successfully.
+              Your demand is raised now, <br />
+              please wait for the response.
             </p>
             <button
               className="alert-btn-full gold"
@@ -3515,6 +3582,33 @@ export default function ShowroomDashboardPage() {
               }}
             >
               Go to Dashboard
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Responded Alert Popup Overlay */}
+      {showRespondedPopup && (
+        <div className="alert-popup-overlay">
+          <div className="alert-popup-panel" style={{ maxWidth: "460px" }}>
+            <div className="alert-icon-circle green">
+              <i className="bx bxs-check-circle" style={{ color: "#0e9f6e", fontSize: "40px" }} />
+            </div>
+            <h2 className="alert-title">Demand Responded!</h2>
+            <p className="alert-text" style={{ fontSize: "15px", lineHeight: "1.5", margin: "12px 0 20px 0" }}>
+              Your demand is successfully responded now, <br />
+              you can place order successfully.
+            </p>
+            <button
+              className="alert-btn-full gold"
+              onClick={() => {
+                setShowRespondedPopup(false);
+                if (currentDashboardDemand?.id) {
+                  setNotifiedRespondedIds((prev) => [...prev, currentDashboardDemand.id]);
+                }
+              }}
+            >
+              Proceed to Place Order
             </button>
           </div>
         </div>

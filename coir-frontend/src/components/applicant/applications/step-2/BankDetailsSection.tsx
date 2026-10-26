@@ -59,7 +59,6 @@ export function BankDetailsSection({
 
   return (
     <section className="application-card">
-
       <div className="application-card__header">
         <h2>
           Documents and Bank Details
@@ -70,10 +69,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            Aadhaar Number{" "}
-            <span className="required">
-              *
-            </span>
+            Aadhaar Number
           </label>
 
           <input
@@ -103,10 +99,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            PAN Card Number{" "}
-            <span className="required">
-              *
-            </span>
+            PAN Card Number
           </label>
 
           <input
@@ -135,10 +128,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            10th Std Marks{" "}
-            <span className="required">
-              *
-            </span>
+            10th Std Marks
           </label>
 
           <input
@@ -167,10 +157,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            12th Std Marks{" "}
-            <span className="required">
-              *
-            </span>
+            12th Std Marks
           </label>
 
           <input
@@ -199,10 +186,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            Bank Name{" "}
-            <span className="required">
-              *
-            </span>
+            Bank Name
           </label>
 
           <input
@@ -230,10 +214,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            Account Holder Name{" "}
-            <span className="required">
-              *
-            </span>
+            Account Holder Name
           </label>
 
           <input
@@ -261,10 +242,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            Account Number{" "}
-            <span className="required">
-              *
-            </span>
+            Account Number
           </label>
 
           <input
@@ -294,10 +272,7 @@ export function BankDetailsSection({
 
         <div className="form-field">
           <label>
-            IFSC Code{" "}
-            <span className="required">
-              *
-            </span>
+            IFSC Code
           </label>
 
           <input

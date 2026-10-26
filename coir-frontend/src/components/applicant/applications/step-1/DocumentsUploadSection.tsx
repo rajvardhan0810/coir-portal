@@ -138,10 +138,7 @@ export function DocumentsUploadSection({
               />
 
               <h4>
-                {document.title}{" "}
-                <span className="required">
-                  *
-                </span>
+                {document.title}
               </h4>
 
               <span className="document-upload-card__hint">

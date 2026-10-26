@@ -94,9 +94,16 @@ export class ShowroomService {
   }
 
   async createDemand(data: any) {
+    let demandId = data.id || `DEM-2026-${Math.floor(100 + Math.random() * 900)}`;
+
+    const existing = await this.prisma.demand.findUnique({ where: { id: demandId } });
+    if (existing) {
+      demandId = `DEM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
     const demand = await this.prisma.demand.create({
       data: {
-        id: data.id,
+        id: demandId,
         category: data.category,
         productName: data.productName,
         dateText: data.dateText,
@@ -104,29 +111,6 @@ export class ShowroomService {
         status: data.status || 'SUBMITTED',
       },
     });
-
-    const suppliersList = await this.prisma.supplier.findMany();
-    for (const sup of suppliersList) {
-      let targetPrice = 450;
-      if (data.category.toLowerCase().includes("mat")) targetPrice = 180;
-      else if (data.category.toLowerCase().includes("rope")) targetPrice = 120;
-      else if (data.category.toLowerCase().includes("mesh")) targetPrice = 2850;
-
-      const base = targetPrice * (sup.rating >= 4.0 ? 1.0 : sup.rating >= 3.0 ? 0.95 : 0.9);
-      const trans = targetPrice * 0.1;
-      const tax = (base + trans) * 0.12;
-
-      await this.prisma.supplierResponse.create({
-        data: {
-          demandId: demand.id,
-          supplierId: sup.id,
-          base,
-          trans,
-          tax,
-          total: base + trans + tax,
-        },
-      });
-    }
 
     return this.prisma.demand.findUnique({
       where: { id: demand.id },

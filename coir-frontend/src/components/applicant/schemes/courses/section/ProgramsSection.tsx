@@ -42,7 +42,8 @@ export function ProgramsSection({
           schemes.find(
             (item) =>
               item.code.toLowerCase() ===
-              schemeCode.toLowerCase(),
+              schemeCode.toLowerCase() ||
+              String(item.id) === schemeCode,
           ) ?? null;
 
         setScheme(currentScheme);

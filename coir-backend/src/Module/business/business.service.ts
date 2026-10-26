@@ -25,6 +25,30 @@ export class BusinessService {
 
   async submitResponse(demandId: string, data: any) {
     const supplierId = data.supplierId || "sup-2";
+    const supplierName = data.supplierName || "Supplier Partner";
+
+    // Ensure supplier exists in DB
+    const existingSup = await this.prisma.supplier.findUnique({
+      where: { id: supplierId },
+    });
+
+    if (!existingSup) {
+      await this.prisma.supplier.create({
+        data: {
+          id: supplierId,
+          name: supplierName,
+          rating: 4.5,
+          stars: 5,
+          availability: "IN STOCK",
+          stock: 1000,
+          fulfillment: "14 Days",
+          base: parseFloat(data.basePrice) || 150,
+          trans: parseFloat(data.transportationPrice) || 15,
+          tax: parseFloat(data.taxPrice) || 20,
+          total: (parseFloat(data.basePrice) || 150) + (parseFloat(data.transportationPrice) || 15) + (parseFloat(data.taxPrice) || 20),
+        },
+      });
+    }
 
     // Update demand status to RESPONDED
     await this.prisma.demand.update({

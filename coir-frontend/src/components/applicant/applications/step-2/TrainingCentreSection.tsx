@@ -70,10 +70,7 @@ export function TrainingCentreSection({
         <div className="training-centre__field">
 
           <label>
-            Select Training Centre{" "}
-            <span className="required">
-              *
-            </span>
+            Select Training Centre
           </label>
 
           <select

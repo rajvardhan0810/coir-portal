@@ -45,7 +45,8 @@ export async function sendUserTypeOtp(
 }
 
 export async function loginWithOtp(payload: {
-  mobile: string;
+  mobile?: string;
+  email?: string;
   otp?: string;
   password?: string;
   captchaId?: string;

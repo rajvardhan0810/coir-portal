@@ -63,10 +63,7 @@ export function ExperienceSection({
 
         <div className="form-field">
           <label>
-            Name of Employer{" "}
-            <span className="required">
-              *
-            </span>
+            Name of Employer
           </label>
 
           <input
@@ -94,10 +91,7 @@ export function ExperienceSection({
 
         <div className="form-field">
           <label>
-            Nature of Work{" "}
-            <span className="required">
-              *
-            </span>
+            Nature of Work
           </label>
 
           <input
@@ -125,10 +119,7 @@ export function ExperienceSection({
 
         <div className="form-field">
           <label>
-            Date of Joining{" "}
-            <span className="required">
-              *
-            </span>
+            Date of Joining
           </label>
 
           <input
@@ -156,10 +147,7 @@ export function ExperienceSection({
 
         <div className="form-field">
           <label>
-            Total Experience (Years){" "}
-            <span className="required">
-              *
-            </span>
+            Total Experience (Years)
           </label>
 
           <input

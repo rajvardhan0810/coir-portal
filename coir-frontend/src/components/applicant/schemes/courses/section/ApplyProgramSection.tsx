@@ -5,6 +5,7 @@ import {
   useState,
 } from "react";
 
+import Link from "next/link";
 import { ApplyActions } from "@/components/applicant/applications/ApplyActions";
 import {
   getProgramsByScheme,
@@ -43,7 +44,8 @@ export function ApplyProgramSection({
           schemes.find(
             (item) =>
               item.code.toLowerCase() ===
-              schemeCode.toLowerCase(),
+              schemeCode.toLowerCase() ||
+              String(item.id) === schemeCode,
           ) ?? null;
 
         setScheme(currentScheme);
@@ -91,6 +93,16 @@ export function ApplyProgramSection({
         <h1 className="application-page__title">
           Program not found
         </h1>
+        <p style={{ marginTop: "12px", color: "var(--color-text-muted, #666)" }}>
+          The requested scheme program could not be found.
+        </p>
+        <Link
+          href="/schemes"
+          className="application-page__btn application-page__btn--primary"
+          style={{ display: "inline-block", marginTop: "20px", textDecoration: "none" }}
+        >
+          Back to Schemes
+        </Link>
       </section>
     );
   }

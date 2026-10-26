@@ -96,199 +96,33 @@ export function normalizeBankDetailsField(
 }
 
 export function validatePersonalDetails(
-  details: PersonalDetailsValues,
+  _details: PersonalDetailsValues,
 ): ValidationErrors<PersonalDetailsValues> {
-  const errors: ValidationErrors<PersonalDetailsValues> = {};
-
-  if (!details.fullName.trim()) {
-    errors.fullName = "Full name is required";
-  }
-
-  if (!details.dob.trim()) {
-    errors.dob = "Date of birth is required";
-  }
-
-  if (!details.fatherName.trim()) {
-    errors.fatherName = "Father / husband name is required";
-  }
-
-  if (!details.gender.trim()) {
-    errors.gender = "Gender is required";
-  }
-
-  if (!details.caste.trim()) {
-    errors.caste = "Caste is required";
-  }
-
-  if (!details.mobile.trim() || !mobilePattern.test(details.mobile.trim())) {
-    errors.mobile = "Invalid mobile number";
-  }
-
-  if (!details.email.trim() || !emailPattern.test(details.email.trim())) {
-    errors.email = "Invalid email address";
-  }
-
-  if (!details.address.trim()) {
-    errors.address = "Address is required";
-  }
-
-  if (!details.city.trim()) {
-    errors.city = "City is required";
-  }
-
-  if (!details.state.trim()) {
-    errors.state = "State is required";
-  }
-
-  if (!details.pincode.trim() || !pincodePattern.test(details.pincode.trim())) {
-    errors.pincode = "Invalid pincode";
-  }
-
-  if (!details.country.trim()) {
-    errors.country = "Country is required";
-  }
-
-  return errors;
+  return {};
 }
 
 export function validateBankDetails(
-  details: BankDetailsValues,
+  _details: BankDetailsValues,
 ): ValidationErrors<BankDetailsValues> {
-  const errors: ValidationErrors<BankDetailsValues> = {};
-  const aadhaarNumber = details.aadhaarNumber.trim();
-  const panNumber = details.panNumber.trim().toUpperCase();
-  const accountNumber = details.accountNumber.trim();
-  const ifscCode = details.ifscCode.trim().toUpperCase();
-
-  if (!aadhaarNumber || !isValidAadhaarNumber(aadhaarNumber)) {
-    errors.aadhaarNumber = "Invalid Aadhaar number";
-  }
-
-  if (!panNumber || !panPattern.test(panNumber)) {
-    errors.panNumber = "Invalid PAN number";
-  }
-
-  const tenthMarks = Number(details.tenthMarks);
-
-  if (
-    !details.tenthMarks.trim() ||
-    Number.isNaN(tenthMarks) ||
-    tenthMarks < 0 ||
-    tenthMarks > 100
-  ) {
-    errors.tenthMarks = "Valid 10th marks are required";
-  }
-
-  const twelfthMarks = Number(details.twelfthMarks);
-
-  if (
-    !details.twelfthMarks.trim() ||
-    Number.isNaN(twelfthMarks) ||
-    twelfthMarks < 0 ||
-    twelfthMarks > 100
-  ) {
-    errors.twelfthMarks = "Valid 12th marks are required";
-  }
-
-  if (!details.bankName.trim()) {
-    errors.bankName = "Bank name is required";
-  }
-
-  if (!details.accountHolderName.trim()) {
-    errors.accountHolderName = "Account holder name is required";
-  }
-
-  if (!accountNumber || !accountNumberPattern.test(accountNumber)) {
-    errors.accountNumber = "Invalid account number";
-  }
-
-  if (!ifscCode || !ifscPattern.test(ifscCode)) {
-    errors.ifscCode = "Invalid IFSC code";
-  }
-
-  return errors;
+  return {};
 }
 
 export function validateStepOneDocuments(
-  documents: StepOneDocumentsValues,
+  _documents: StepOneDocumentsValues,
 ): ValidationErrors<StepOneDocumentsValues> {
-  const errors: ValidationErrors<StepOneDocumentsValues> = {};
-
-  if (!documents.photo) {
-    errors.photo = "Photo is required";
-  }
-
-  if (!documents.aadhaar) {
-    errors.aadhaar = "Aadhaar document is required";
-  }
-
-  if (!documents.pan) {
-    errors.pan = "PAN document is required";
-  }
-
-  if (!documents.tenthMarksheet) {
-    errors.tenthMarksheet = "10th marksheet is required";
-  }
-
-  if (!documents.twelfthMarksheet) {
-    errors.twelfthMarksheet = "12th marksheet is required";
-  }
-
-  if (!documents.graduationCertificate) {
-    errors.graduationCertificate = "Graduation marksheet is required";
-  }
-
-  if (!documents.casteCertificate) {
-    errors.casteCertificate = "Caste certificate is required";
-  }
-
-  return errors;
+  return {};
 }
 
 export function validateExperienceDetails(
-  experience: ExperienceDetailsValues,
+  _experience: ExperienceDetailsValues,
 ): ValidationErrors<ExperienceDetailsValues> {
-  const errors: ValidationErrors<ExperienceDetailsValues> = {};
-
-  if (!experience.employerName.trim()) {
-    errors.employerName = "Employer name is required";
-  }
-
-  if (!experience.natureOfWork.trim()) {
-    errors.natureOfWork = "Nature of work is required";
-  }
-
-  if (!experience.dateOfJoining.trim()) {
-    errors.dateOfJoining = "Date of joining is required";
-  }
-
-  const totalExperience = Number(experience.totalExperience);
-
-  if (
-    !experience.totalExperience.trim() ||
-    Number.isNaN(totalExperience) ||
-    totalExperience < 0
-  ) {
-    errors.totalExperience = "Valid total experience is required";
-  }
-
-  return errors;
+  return {};
 }
 
 export function validateStepTwoDocuments(
-  documents: StepTwoDocumentsValues,
+  _documents: StepTwoDocumentsValues,
 ): ValidationErrors<StepTwoDocumentsValues> {
-  const errors: ValidationErrors<StepTwoDocumentsValues> = {};
-
-  if (!documents.cancelCheque) {
-    errors.cancelCheque = "Cancel cheque is required";
-  }
-
-  if (!documents.experienceLetter) {
-    errors.experienceLetter = "Experience letter is required";
-  }
-
-  return errors;
+  return {};
 }
 
 export function hasValidationErrors<T extends object>(

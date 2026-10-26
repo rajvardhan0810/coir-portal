@@ -86,6 +86,32 @@ const initialResponseState: ResponseFormState = {
   deliveryPinCode: "",
 };
 
+function getSupplierInfo(user: UserProfile | null) {
+  const email = (user?.email || "").toLowerCase().trim();
+  const name = (user?.fullName || "").toLowerCase().trim();
+
+  if (email.includes("kerala") || name.includes("kerala")) {
+    return { supplierId: "sup-1", name: "Kerala Coir Crafts", email: email || "keralacoir@supplier.com" };
+  }
+  if (email.includes("alleppey") || name.includes("alleppey")) {
+    return { supplierId: "sup-2", name: "Alleppey Weaves", email: email || "alleppeyweaves@supplier.com" };
+  }
+  if (email.includes("malabarcoop") || email.includes("coop") || name.includes("co-op")) {
+    return { supplierId: "sup-3", name: "Malabar Co-op", email: email || "malabarcoop@supplier.com" };
+  }
+  if (email.includes("southern") || name.includes("southern")) {
+    return { supplierId: "sup-4", name: "Southern Fibre Exporters", email: email || "southernfibre@supplier.com" };
+  }
+  if (email.includes("malabarweaves") || name.includes("malabar weaves")) {
+    return { supplierId: "sup-5", name: "Malabar Weaves Ltd", email: email || "malabarweaves@supplier.com" };
+  }
+
+  const emailPrefix = email ? email.split("@")[0] : "supplier";
+  const formattedName = user?.fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) + " Supplier");
+  const derivedId = `sup-${emailPrefix.replace(/[^a-z0-9]/gi, "")}`;
+  return { supplierId: derivedId || "sup-2", name: formattedName, email: email || "supplier@coirboard.gov.in" };
+}
+
 export default function BusinessDashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -96,11 +122,14 @@ export default function BusinessDashboardPage() {
 
   // Dynamic Demands and Response states
   const [demands, setDemands] = useState<any[]>([]);
-  const [respondedDemandIds, setRespondedDemandIds] = useState<string[]>(["DEM-2026-089"]);
+  const [respondedDemandIds, setRespondedDemandIds] = useState<string[]>([]);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const refreshDemandsData = async () => {
+  const currentSupplier = getSupplierInfo(user);
+
+  const refreshDemandsData = async (targetSupId?: string) => {
+    const supId = targetSupId || currentSupplier.supplierId;
     try {
       const demandsData = await showroomService.getBusinessDemands();
       const mapped = demandsData.map((item: any) => ({
@@ -119,13 +148,12 @@ export default function BusinessDashboardPage() {
         remarks: item.remarks || "",
         deliveryPinCode: item.pinCode || "682030",
         status: item.status,
-        rawResponses: item.responses
+        rawResponses: item.responses || []
       }));
       setDemands(mapped);
 
-      // We default to "sup-2" (Alleppey Weaves) as the supplier for the logged-in Business partner
       const respondedIds = demandsData
-        .filter((d: any) => d.responses.some((r: any) => r.supplierId === "sup-2"))
+        .filter((d: any) => d.responses?.some((r: any) => r.supplierId === supId))
         .map((d: any) => d.id);
       setRespondedDemandIds(respondedIds);
     } catch (e) {
@@ -135,7 +163,7 @@ export default function BusinessDashboardPage() {
 
   useEffect(() => {
     refreshDemandsData();
-  }, []);
+  }, [user]);
 
   const confirmResponseSubmission = async () => {
     if (!selectedDemand) return;
@@ -143,7 +171,8 @@ export default function BusinessDashboardPage() {
 
     try {
       await showroomService.submitBusinessResponse(targetId, {
-        supplierId: "sup-2",
+        supplierId: currentSupplier.supplierId,
+        supplierName: currentSupplier.name,
         basePrice: responseForm.basePrice,
         transportationPrice: responseForm.transportationPrice,
         taxPrice: responseForm.taxPrice,
@@ -199,7 +228,7 @@ export default function BusinessDashboardPage() {
     setSelectedDemand(demand);
     
     // Check if there is an existing response for this demand from this supplier
-    const existingResponse = demand.rawResponses?.find((r: any) => r.supplierId === "sup-2");
+    const existingResponse = demand.rawResponses?.find((r: any) => r.supplierId === currentSupplier.supplierId);
     if (existingResponse) {
       setResponseForm({
         quantity: demand.qty ? demand.qty.replace(/[^0-9]/g, "") : "3200",
@@ -307,9 +336,9 @@ export default function BusinessDashboardPage() {
                   </div>
 
                   <div className="business-demand-view__identity">
-                    <span>{user.fullName ?? "Business User"}</span>
+                    <span>{currentSupplier.name} ({currentSupplier.email})</span>
                     <small>
-                      {user.mobile} - {[user.city, user.state].filter(Boolean).join(", ") || "Location Pending"}
+                      Supplier ID: {currentSupplier.supplierId} • {[user.city, user.state].filter(Boolean).join(", ") || "Kerala, India"}
                     </small>
                   </div>
                 </div>

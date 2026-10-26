@@ -94,10 +94,7 @@ export function UploadDocumentsSection({
               className="upload-item"
             >
               <label className="upload-label">
-                {document.label}{" "}
-                <span className="required">
-                  *
-                </span>
+                {document.label}
               </label>
 
               <div className="upload-wrapper">

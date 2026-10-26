@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { createApplication } from "@/services/application.service";
 
@@ -32,11 +33,18 @@ export function ApplyActions({
       router.push(
         `/applications/${application.id}/step-1`,
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
 
-      alert(
-        "Failed to create application",
+      if (error?.response?.status === 401) {
+        toast.error("Please log in to apply for this scheme");
+        router.push("/login");
+        return;
+      }
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Failed to create application. Please try again.",
       );
     } finally {
       setLoading(false);

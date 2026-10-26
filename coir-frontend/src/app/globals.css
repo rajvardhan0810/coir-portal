@@ -953,31 +953,87 @@ ul {
   opacity: 0.72;
 }
 
-.auth-captcha-row {
-  display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 54px;
-  align-items: center;
+.auth-captcha-group {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.auth-captcha-code {
-  display: grid;
-  place-items: center;
-  min-height: 64px;
-  overflow: hidden;
+.auth-captcha-label {
+  margin-top: 0 !important;
+  color: #444444;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.auth-captcha-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-captcha-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 120px;
+  height: 48px;
+  padding: 0 16px;
   border-radius: 8px;
-  border: 1px solid #e1e1e1;
+  border: 1px solid #cce0e5;
   background:
-    radial-gradient(circle at 18px 14px, rgba(65, 145, 165, 0.18) 0 1px, transparent 2px),
-    radial-gradient(circle at 34px 31px, rgba(40, 40, 40, 0.16) 0 1px, transparent 2px),
-    linear-gradient(135deg, rgba(209, 227, 229, 0.9), rgba(249, 249, 249, 0.92));
-  background-size: 18px 18px, 22px 22px, auto;
-  color: #61a9ba;
+    radial-gradient(circle at 18px 14px, rgba(65, 145, 165, 0.15) 0 1px, transparent 2px),
+    linear-gradient(135deg, rgba(215, 235, 238, 0.95), rgba(242, 248, 250, 0.95));
+  background-size: 18px 18px, auto;
+  color: #418596;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 42px;
+  font-size: 22px;
+  font-weight: 700;
   font-style: italic;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.auth-captcha-badge:hover {
+  border-color: #9ec8d2;
+  box-shadow: 0 2px 6px rgba(65, 133, 150, 0.15);
+}
+
+.auth-captcha-refresh {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.auth-captcha-refresh:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+.auth-captcha-row input {
+  flex: 1;
+  min-height: 48px !important;
+  height: 48px !important;
+  font-size: 16px !important;
+  padding: 10px 14px !important;
 }
 
 .auth-primary,

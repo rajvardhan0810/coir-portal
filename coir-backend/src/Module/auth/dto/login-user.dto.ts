@@ -20,12 +20,17 @@ export class LoginUserDto {
   @IsEnum(UserType)
   userType?: UserType;
 
-  @ValidateIf((dto: LoginUserDto) => !dto.mobileNumber)
+  @IsOptional()
+  @Transform(trimValue)
+  @IsString()
+  email?: string;
+
+  @ValidateIf((dto: LoginUserDto) => !dto.mobileNumber && !dto.email)
   @Transform(normalizeMobile)
   @IsMobilePhone('en-IN')
   mobile?: string;
 
-  @ValidateIf((dto: LoginUserDto) => !dto.mobile)
+  @ValidateIf((dto: LoginUserDto) => !dto.mobile && !dto.email)
   @Transform(normalizeMobile)
   @IsMobilePhone('en-IN')
   mobileNumber?: string;

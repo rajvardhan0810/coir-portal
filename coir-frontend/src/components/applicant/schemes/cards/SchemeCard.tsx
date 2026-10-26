@@ -44,7 +44,7 @@ export function SchemeCard({
         </Link>
 
         <Link
-          href={`/schemes/${scheme.code.toLowerCase()}/details`}
+          href={`/schemes/${scheme.code.toLowerCase()}`}
           className="scheme-card__details"
         >
           View Details

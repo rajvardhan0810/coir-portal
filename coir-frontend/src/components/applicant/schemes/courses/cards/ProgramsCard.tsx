@@ -62,7 +62,7 @@ export function ProgramsCard({
         </Link>
 
         <Link
-          href={`/schemes/${schemeId}/details`}
+          href={`/schemes/${schemeId}/${program.id}/apply`}
           className="scheme-course-card__details"
         >
           View Details

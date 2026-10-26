@@ -13,22 +13,27 @@ import type { CaptchaResponse } from "@/types/auth.types";
 
 type LoginFormProps = {
   userType?: "INDIVIDUAL" | "BUSINESS";
+  defaultEmail?: string;
   defaultMobile?: string;
   defaultPassword?: string;
 };
 
 export function LoginForm({
   userType = "INDIVIDUAL",
+  defaultEmail,
   defaultMobile,
   defaultPassword,
 }: LoginFormProps) {
   const router = useRouter();
   const isBusinessUser = userType === "BUSINESS";
+  const [email, setEmail] = useState(
+    isBusinessUser ? (defaultEmail ?? "supplier@coirboard.gov.in") : "",
+  );
   const [mobile, setMobile] = useState(
-    isBusinessUser ? (defaultMobile ?? "") : "",
+    isBusinessUser ? (defaultMobile ?? "9625732059") : "",
   );
   const [password, setPassword] = useState(
-    isBusinessUser ? (defaultPassword ?? "") : "",
+    isBusinessUser ? (defaultPassword ?? "123456789") : "",
   );
   const [otp, setOtp] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
@@ -38,13 +43,17 @@ export function LoginForm({
   const [devOtp, setDevOtp] = useState("");
 
   async function loadCaptcha() {
-    const nextCaptcha = await getCaptcha();
-    setCaptcha(nextCaptcha);
-    setCaptchaAnswer(
-      isBusinessUser
-        ? (nextCaptcha.devCaptchaCode ?? "")
-        : "",
-    );
+    try {
+      const nextCaptcha = await getCaptcha();
+      setCaptcha(nextCaptcha);
+      setCaptchaAnswer(
+        isBusinessUser
+          ? (nextCaptcha.devCaptchaCode ?? "")
+          : "",
+      );
+    } catch {
+      setMessage("Captcha load nahi ho paya. Backend server check karein.");
+    }
   }
 
   useEffect(() => {
@@ -92,14 +101,16 @@ export function LoginForm({
     setMessage("");
     try {
       const response = await loginWithOtp({
-        mobile,
         ...(isBusinessUser
           ? {
+              email,
+              mobile: mobile || "9625732059",
               password,
               captchaId: captcha?.captchaId ?? "",
               captchaCode: captchaAnswer,
             }
           : {
+              mobile,
               otp,
               captchaId: captcha?.captchaId ?? "",
               captchaCode: captchaAnswer,
@@ -117,9 +128,7 @@ export function LoginForm({
       );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Login failed");
-      await loadCaptcha().catch(() => {
-        setMessage("Captcha refresh nahi ho paya. Backend server check karein.");
-      });
+      await loadCaptcha();
     } finally {
       setLoading(false);
     }
@@ -145,32 +154,19 @@ export function LoginForm({
       </div>
 
       <form className="auth-card" onSubmit={login}>
-        <label>
-          Mobile Number <span className="required">*</span>
-          <span className={isBusinessUser ? "" : "auth-input-action"}>
-            <input
-              value={mobile}
-              onChange={(event) => setMobile(event.target.value)}
-              placeholder="9812345678"
-              type="tel"
-              inputMode="numeric"
-              maxLength={10}
-              required
-            />
-            {isBusinessUser ? null : (
-              <button
-                type="button"
-                onClick={handleSendOtp}
-                disabled={loading || mobile.length !== 10}
-              >
-                Get OTP
-              </button>
-            )}
-          </span>
-        </label>
-
         {isBusinessUser ? (
           <>
+            <label>
+              Supplier Email Address <span className="required">*</span>
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="supplier@coirboard.gov.in"
+                type="email"
+                required
+              />
+            </label>
+
             <label>
               Password <span className="required">*</span>
               <input
@@ -186,10 +182,32 @@ export function LoginForm({
               captcha={captcha}
               value={captchaAnswer}
               onChange={setCaptchaAnswer}
+              onRefresh={loadCaptcha}
             />
           </>
         ) : (
           <>
+            <label>
+              Mobile Number <span className="required">*</span>
+              <span className="auth-input-action">
+                <input
+                  value={mobile}
+                  onChange={(event) => setMobile(event.target.value)}
+                  placeholder="9812345678"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={loading || mobile.length !== 10}
+                >
+                  Get OTP
+                </button>
+              </span>
+            </label>
             {devOtp ? <p className="dev-otp">Dev OTP: {devOtp}</p> : null}
 
             <OtpInput value={otp} onChange={setOtp} />
@@ -197,6 +215,7 @@ export function LoginForm({
               captcha={captcha}
               value={captchaAnswer}
               onChange={setCaptchaAnswer}
+              onRefresh={loadCaptcha}
             />
           </>
         )}
