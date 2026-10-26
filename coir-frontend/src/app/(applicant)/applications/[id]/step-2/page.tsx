@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useParams } from "next/navigation";
+import { getApplication } from "@/services/application.service";
 
 import { ApplicationShell }
 from "@/components/applicant/applications/layout/ApplicationShell";
@@ -98,6 +99,66 @@ export default function StepTwoPage() {
       {},
     );
 
+  const [application, setApplication] =
+    useState<any>(null);
+
+  useEffect(() => {
+    async function fetchApplication() {
+      try {
+        const data =
+          await getApplication(
+            applicationId,
+          );
+
+        setApplication(data);
+
+        if (data.trainingCentreId) {
+          setTrainingCentreId(
+            data.trainingCentreId,
+          );
+        }
+
+        if (
+          data.detail
+            ?.experienceDetails
+        ) {
+          setExperience(
+            data.detail
+              .experienceDetails,
+          );
+        }
+
+        if (
+          data.detail
+            ?.bankDetails
+        ) {
+          setBankDetails(
+            data.detail
+              .bankDetails,
+          );
+        }
+
+        if (
+          data.detail
+            ?.documents
+        ) {
+          setDocuments(
+            (prev) => ({
+              ...prev,
+              ...data.detail.documents,
+            }),
+          );
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (applicationId) {
+      fetchApplication();
+    }
+  }, [applicationId]);
+
   return (
     <ApplicationShell>
 
@@ -110,11 +171,11 @@ export default function StepTwoPage() {
       >
         <div className="application-page-header">
           <p>
-            APPLICATION FORM
+            APPLICATION FORM {application?.scheme?.name ? `• ${application.scheme.name}` : ""}
           </p>
 
           <h1>
-            Diploma Course in Coir Technology
+            {application?.program?.title || "Application Form"}
           </h1>
         </div>
 

@@ -250,24 +250,43 @@ export default function ShowroomDashboardPage() {
     }
   }, [currentDashboardDemand?.id, currentDashboardDemand?.status, notifiedRespondedIds]);
 
-  const respondedSuppliers = suppliers.filter((s) => {
-    if (currentDashboardDemand?.status === "SUBMITTED") {
-      return false;
-    }
-    if (currentDashboardDemand?.rawResponses && currentDashboardDemand.rawResponses.length > 0) {
-      const submittedResponses = currentDashboardDemand.rawResponses.filter((r: any) => r.isSubmitted);
-      if (submittedResponses.length > 0) {
-        return submittedResponses.some((r: any) => r.supplierId === s.id);
-      }
-    }
-    if (currentDashboardDemand?.status === "RESPONDED") {
-      return s.id === "sup-1" || s.id === "sup-2";
-    }
-    return false;
-  });
+  const respondedSuppliers = currentDashboardDemand?.status === "SUBMITTED"
+    ? []
+    : (currentDashboardDemand?.rawResponses || [])
+        .map((r: any) => {
+          const existing = suppliers.find((s) => s.id === r.supplierId);
+          if (existing) return existing;
+          if (r.supplier) {
+            return {
+              id: r.supplier.id,
+              name: r.supplier.name,
+              rating: parseFloat(r.supplier.rating) || 4.5,
+              stars: parseInt(r.supplier.stars) || 5,
+              availability: (r.supplier.availability || "IN STOCK") as any,
+              stock: parseInt(r.supplier.stock) || 1000,
+              fulfillment: r.supplier.fulfillment || "14 Days",
+              base: parseFloat(r.base ?? r.supplier.base) || 0,
+              trans: parseFloat(r.trans ?? r.supplier.trans) || 0,
+              tax: parseFloat(r.tax ?? r.supplier.tax) || 0,
+              total: parseFloat(r.total ?? r.supplier.total) || 0,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean) as SupplierRow[];
 
   // Order Allocation view toggle state
   const [isAllocatingOrder, setIsAllocatingOrder] = useState(false);
+  const [allocationInputs, setAllocationInputs] = useState<
+    Record<
+      string,
+      {
+        allocatedQty: string;
+        deliveryTimeline: string;
+        remarks: string;
+      }
+    >
+  >({});
 
   // Placed Orders and popup states
   const [placedOrders, setPlacedOrders] = useState<any[]>([]);
@@ -418,20 +437,45 @@ export default function ShowroomDashboardPage() {
   const confirmOrderSubmission = async () => {
     if (!currentDashboardDemand) return;
 
-    const allocations = suppliers
-      .filter((s) => selectedSupplierIds.includes(s.id))
-      .map((s) => {
-        const pricing = getSupplierPriceForDemand(s, currentDashboardDemand);
-        return {
-          supplierId: s.id,
-          supplierName: s.name,
-          rating: s.rating,
-          stars: s.stars,
-          allocatedQty: String(s.stock),
-          fulfillment: s.fulfillment,
-          priceBreakup: pricing,
-        };
-      });
+    const allocationSuppliers = (respondedSuppliers.length > 0 ? respondedSuppliers : suppliers)
+      .filter((s) => selectedSupplierIds.includes(s.id));
+
+    // Validate that no supplier exceeds stock
+    for (const s of allocationSuppliers) {
+      const entry = allocationInputs[s.id];
+      const qtyStr = entry?.allocatedQty !== undefined ? entry.allocatedQty : String(s.stock);
+      const qtyNum = Number(qtyStr);
+
+      if (isNaN(qtyNum) || qtyNum <= 0) {
+        alert(`Please enter a valid allocated quantity for ${s.name}.`);
+        setShowOrderConfirmPopup(false);
+        return;
+      }
+      if (qtyNum > s.stock) {
+        alert(`Allocated quantity (${qtyNum}) is larger than stock (${s.stock}) for ${s.name}. Please adjust the quantity before submitting.`);
+        setShowOrderConfirmPopup(false);
+        return;
+      }
+    }
+
+    const allocations = allocationSuppliers.map((s) => {
+      const pricing = getSupplierPriceForDemand(s, currentDashboardDemand);
+      const entry = allocationInputs[s.id];
+      const allocQty = entry?.allocatedQty !== undefined ? entry.allocatedQty : String(s.stock);
+      const deliveryTimeline = entry?.deliveryTimeline || "11/04/2026";
+      const remarks = entry?.remarks || "";
+
+      return {
+        supplierId: s.id,
+        supplierName: s.name,
+        rating: s.rating,
+        stars: s.stars,
+        allocatedQty: allocQty,
+        fulfillment: deliveryTimeline ? `${deliveryTimeline}` : s.fulfillment,
+        priceBreakup: pricing,
+        remarks: remarks,
+      };
+    });
 
     try {
       await showroomService.placeOrder(currentDashboardDemand.id, {
@@ -445,9 +489,9 @@ export default function ShowroomDashboardPage() {
       setShowOrderConfirmPopup(false);
       setShowOrderSuccessPopup(true);
       await refreshAllData();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Failed to submit order allocation.");
+      alert(e?.response?.data?.message || e?.message || "Failed to submit order allocation.");
     }
   };
 
@@ -684,6 +728,21 @@ export default function ShowroomDashboardPage() {
       alert("Please select at least one supplier to place an order.");
       return;
     }
+    const activeSuppliers = respondedSuppliers.length > 0 ? respondedSuppliers : suppliers;
+    setAllocationInputs((prev) => {
+      const updated = { ...prev };
+      selectedSupplierIds.forEach((id) => {
+        const sup = activeSuppliers.find((s) => s.id === id);
+        if (sup && !updated[id]) {
+          updated[id] = {
+            allocatedQty: String(sup.stock),
+            deliveryTimeline: "11/04/2026",
+            remarks: "",
+          };
+        }
+      });
+      return updated;
+    });
     setIsAllocatingOrder(true);
   };
 
@@ -2183,17 +2242,24 @@ export default function ShowroomDashboardPage() {
 
                 {/* Suppliers Allocation List */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {suppliers
-                    .filter((s) => selectedSupplierIds.includes(s.id))
+                  {((respondedSuppliers.length > 0 ? respondedSuppliers : suppliers)
+                    .filter((s) => selectedSupplierIds.includes(s.id)))
                     .map((s) => {
                       const pricing = getSupplierPriceForDemand(s, currentDashboardDemand);
+                      const currentAlloc = allocationInputs[s.id];
+                      const qtyVal = currentAlloc?.allocatedQty !== undefined ? currentAlloc.allocatedQty : String(s.stock);
+                      const qtyNum = Number(qtyVal);
+                      const isStockExceeded = !isNaN(qtyNum) && qtyNum > s.stock;
+                      const isInvalidQty = qtyVal === "" || isNaN(qtyNum) || qtyNum <= 0;
+
                       return (
                         <div key={s.id} style={{
                           background: "#ffffff",
-                          border: "1px solid #e7dfd3",
+                          border: isStockExceeded ? "1.5px solid #dc2626" : "1px solid #e7dfd3",
                           borderRadius: "12px",
                           overflow: "hidden",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+                          boxShadow: isStockExceeded ? "0 4px 14px rgba(220, 38, 38, 0.08)" : "0 4px 12px rgba(0,0,0,0.02)",
+                          transition: "all 0.2s ease"
                         }}>
                           {/* Supplier Row Header */}
                           <div style={{
@@ -2251,7 +2317,12 @@ export default function ShowroomDashboardPage() {
 
                           {/* Allocation Entry Details Panel */}
                           <div style={{ padding: "24px", backgroundColor: "#ffffff", borderTop: "1px solid #f7f3eb" }}>
-                            <h4 style={{ margin: "0 0 16px 0", fontSize: "15px", fontWeight: "800", color: "#8b642b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Allocation Entry</h4>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                              <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#8b642b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Allocation Entry</h4>
+                              <span style={{ fontSize: "12px", fontWeight: "700", color: "#718096" }}>
+                                Available Stock: <strong style={{ color: "#4b2822" }}>{s.stock.toLocaleString()}</strong> units
+                              </span>
+                            </div>
                             
                             <div style={{
                               display: "grid",
@@ -2259,12 +2330,62 @@ export default function ShowroomDashboardPage() {
                               gap: "16px"
                             }}>
                               <div className="form-group">
-                                <label style={{ fontSize: "11px", fontWeight: "800", color: "#8b642b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Allocated Quantity</label>
+                                <label style={{ fontSize: "11px", fontWeight: "800", color: isStockExceeded ? "#dc2626" : "#8b642b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                                  Allocated Quantity
+                                </label>
                                 <input
-                                  type="text"
+                                  type="number"
+                                  min="1"
                                   className="form-input"
-                                  defaultValue={s.stock}
+                                  value={qtyVal}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setAllocationInputs((prev) => ({
+                                      ...prev,
+                                      [s.id]: {
+                                        allocatedQty: val,
+                                        deliveryTimeline: prev[s.id]?.deliveryTimeline ?? "11/04/2026",
+                                        remarks: prev[s.id]?.remarks ?? "",
+                                      }
+                                    }));
+                                  }}
+                                  style={{
+                                    borderColor: isStockExceeded ? "#dc2626" : isInvalidQty ? "#d97706" : undefined,
+                                    backgroundColor: isStockExceeded ? "#fef2f2" : undefined,
+                                    color: isStockExceeded ? "#991b1b" : undefined,
+                                    fontWeight: "700",
+                                  }}
                                 />
+                                {isStockExceeded && (
+                                  <div style={{
+                                    marginTop: "6px",
+                                    color: "#dc2626",
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                    lineHeight: "1.3"
+                                  }}>
+                                    <i className="bx bx-error-circle" style={{ fontSize: "16px", flexShrink: 0 }} />
+                                    <span>Quantity is larger than stock (Available: {s.stock.toLocaleString()})</span>
+                                  </div>
+                                )}
+                                {!isStockExceeded && isInvalidQty && (
+                                  <div style={{
+                                    marginTop: "6px",
+                                    color: "#d97706",
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                    lineHeight: "1.3"
+                                  }}>
+                                    <i className="bx bx-error-circle" style={{ fontSize: "15px", flexShrink: 0 }} />
+                                    <span>Please enter a valid quantity (&gt; 0)</span>
+                                  </div>
+                                )}
                               </div>
                               <div className="form-group">
                                 <label style={{ fontSize: "11px", fontWeight: "800", color: "#8b642b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Agreed Price (Per Unit)</label>
@@ -2280,7 +2401,18 @@ export default function ShowroomDashboardPage() {
                                 <input
                                   type="text"
                                   className="form-input"
-                                  defaultValue="11/04/2026"
+                                  value={currentAlloc?.deliveryTimeline ?? "11/04/2026"}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setAllocationInputs((prev) => ({
+                                      ...prev,
+                                      [s.id]: {
+                                        allocatedQty: prev[s.id]?.allocatedQty ?? String(s.stock),
+                                        deliveryTimeline: val,
+                                        remarks: prev[s.id]?.remarks ?? "",
+                                      }
+                                    }));
+                                  }}
                                 />
                               </div>
                               <div className="form-group">
@@ -2289,6 +2421,18 @@ export default function ShowroomDashboardPage() {
                                   type="text"
                                   className="form-input"
                                   placeholder="e.g. priority transit required"
+                                  value={currentAlloc?.remarks ?? ""}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setAllocationInputs((prev) => ({
+                                      ...prev,
+                                      [s.id]: {
+                                        allocatedQty: prev[s.id]?.allocatedQty ?? String(s.stock),
+                                        deliveryTimeline: prev[s.id]?.deliveryTimeline ?? "11/04/2026",
+                                        remarks: val,
+                                      }
+                                    }));
+                                  }}
                                 />
                               </div>
                             </div>
@@ -2299,15 +2443,66 @@ export default function ShowroomDashboardPage() {
                 </div>
 
                 {/* Submit Button Block */}
-                <div style={{ display: "flex", justifyContent: "center", marginTop: "32px" }}>
-                  <button
-                    className="btn-solid-gold"
-                    style={{ padding: "16px 40px", fontSize: "16px", fontWeight: "800" }}
-                    onClick={() => setShowOrderConfirmPopup(true)}
-                  >
-                    Submit Order
-                  </button>
-                </div>
+                {(() => {
+                  const currentAllocSuppliers = (respondedSuppliers.length > 0 ? respondedSuppliers : suppliers)
+                    .filter((s) => selectedSupplierIds.includes(s.id));
+                  
+                  const hasStockExceeded = currentAllocSuppliers.some((s) => {
+                    const entry = allocationInputs[s.id];
+                    const q = Number(entry?.allocatedQty !== undefined ? entry.allocatedQty : s.stock);
+                    return isNaN(q) || q > s.stock;
+                  });
+
+                  const hasInvalidQty = currentAllocSuppliers.some((s) => {
+                    const entry = allocationInputs[s.id];
+                    const q = Number(entry?.allocatedQty !== undefined ? entry.allocatedQty : s.stock);
+                    return isNaN(q) || q <= 0;
+                  });
+
+                  const isSubmitDisabled = hasStockExceeded || hasInvalidQty;
+
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", marginTop: "32px" }}>
+                      {hasStockExceeded && (
+                        <div style={{
+                          backgroundColor: "#fef2f2",
+                          border: "1px solid #fca5a5",
+                          borderRadius: "8px",
+                          padding: "10px 20px",
+                          color: "#991b1b",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px"
+                        }}>
+                          <i className="bx bx-error-circle" style={{ fontSize: "18px" }} />
+                          <span>Allocated quantity cannot exceed the available stock. Please adjust the highlighted quantities.</span>
+                        </div>
+                      )}
+                      <button
+                        className="btn-solid-gold"
+                        style={{
+                          padding: "16px 40px",
+                          fontSize: "16px",
+                          fontWeight: "800",
+                          opacity: isSubmitDisabled ? 0.6 : 1,
+                          cursor: isSubmitDisabled ? "not-allowed" : "pointer"
+                        }}
+                        disabled={isSubmitDisabled}
+                        onClick={() => {
+                          if (isSubmitDisabled) {
+                            alert("Please correct the allocated quantities before submitting.");
+                            return;
+                          }
+                          setShowOrderConfirmPopup(true);
+                        }}
+                      >
+                        Submit Order
+                      </button>
+                    </div>
+                  );
+                })()}
               </>
             ) : (
               <>

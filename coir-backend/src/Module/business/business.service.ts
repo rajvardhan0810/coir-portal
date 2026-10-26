@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -24,7 +24,10 @@ export class BusinessService {
   }
 
   async submitResponse(demandId: string, data: any) {
-    const supplierId = data.supplierId || "sup-2";
+    const supplierId = data.supplierId;
+    if (!supplierId) {
+      throw new BadRequestException('Supplier ID is required');
+    }
     const supplierName = data.supplierName || "Supplier Partner";
 
     // Ensure supplier exists in DB

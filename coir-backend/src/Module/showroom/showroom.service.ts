@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -125,6 +125,22 @@ export class ShowroomService {
   }
 
   async placeOrder(demandId: string, data: any) {
+    if (data.allocations && Array.isArray(data.allocations)) {
+      for (const alloc of data.allocations) {
+        const qtyNum = parseInt(String(alloc.allocatedQty), 10);
+        if (alloc.supplierId) {
+          const supplier = await this.prisma.supplier.findUnique({
+            where: { id: alloc.supplierId },
+          });
+          if (supplier && !isNaN(qtyNum) && qtyNum > supplier.stock) {
+            throw new BadRequestException(
+              `Allocated quantity (${qtyNum}) is larger than stock (${supplier.stock}) for supplier ${supplier.name}`
+            );
+          }
+        }
+      }
+    }
+
     await this.prisma.demand.update({
       where: { id: demandId },
       data: { status: 'ORDER PLACED' },

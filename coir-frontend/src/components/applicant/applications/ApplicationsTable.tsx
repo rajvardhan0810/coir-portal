@@ -16,7 +16,7 @@ type Application = {
     name: string;
   };
 
-  course: {
+  program?: {
     title: string;
   };
 };
@@ -58,7 +58,7 @@ export function ApplicationsTable() {
           <thead>
             <tr>
               <th>Application ID</th>
-              <th>Scheme Name</th>
+              <th>Scheme / Program</th>
               <th>Applied Date</th>
               <th>Status</th>
               <th>Actions</th>
@@ -78,10 +78,12 @@ export function ApplicationsTable() {
                   </td>
 
                   <td>
-                    {
-                      application.scheme
-                        .name
-                    }
+                    <div><strong>{application.scheme?.name}</strong></div>
+                    {application.program?.title && (
+                      <div style={{ fontSize: "0.85rem", color: "var(--color-text-muted, #666)" }}>
+                        {application.program.title}
+                      </div>
+                    )}
                   </td>
 
                   <td>

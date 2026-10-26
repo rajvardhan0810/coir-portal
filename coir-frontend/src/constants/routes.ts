@@ -82,19 +82,19 @@ export const navigationItems: NavItem[] = [
           },
           {
             label: "Science and Technology",
-            href: ROUTES.schemesSection,
+            href: "/schemes/st",
           },
           {
             label: "Skill Upgradation and Mahila Coir Yojana",
-            href: ROUTES.login,
+            href: "/schemes/cvy",
           },
           {
             label: "Export Market Promotion",
-            href: ROUTES.schemesSection,
+            href: "/schemes/emp",
           },
           {
             label: "Domestic Market Promotion",
-            href: ROUTES.schemesSection,
+            href: "/schemes/dmp",
           },
           {
             label:

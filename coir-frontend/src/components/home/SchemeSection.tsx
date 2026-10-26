@@ -8,7 +8,7 @@ const schemeHighlights = [
     title: "COIR Schemes",
     description: "India is the home of coir where coir weaving started.",
     icon: "flaticon-consulting",
-    href: ROUTES.login,
+    href: ROUTES.schemes,
   },
   {
     title: "SFURTI",
@@ -42,13 +42,13 @@ const coirVikasSchemes = [
     title: "Science And Technology",
     description: "Central Sector Scheme of Science and Technology.",
     icon: "flaticon-web-development",
-    href: ROUTES.schemesSection,
+    href: "/schemes/st",
   },
   {
     title: "Skill Upgradation and Mahila Coir Yojana",
     description: "Skill Upgradation and Mahila Coir Yojana.",
     icon: "flaticon-consulting",
-    href: ROUTES.login,
+    href: "/schemes/cvy",
   },
 ];
 

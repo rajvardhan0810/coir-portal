@@ -82,23 +82,25 @@ export default function StepOnePage() {
   useEffect(() => {
     async function fetchApplication() {
       try {
-        const application =
+        const applicationData =
           await getApplication(
             applicationId,
           );
 
+        setApplication(applicationData);
+
         if (
-          application.detail
+          applicationData.detail
             ?.personalDetails
         ) {
           setFormData(
-            application.detail
+            applicationData.detail
               .personalDetails,
           );
         }
 
         if (
-          application.detail
+          applicationData.detail
             ?.documents
         ) {
           setDocuments(
@@ -106,7 +108,7 @@ export default function StepOnePage() {
               prev,
             ) => ({
               ...prev,
-              ...application
+              ...applicationData
                 .detail
                 .documents,
             }),
@@ -133,11 +135,11 @@ export default function StepOnePage() {
       >
         <div className="application-page-header">
           <p>
-            APPLICATION FORM
+            APPLICATION FORM {application?.scheme?.name ? `• ${application.scheme.name}` : ""}
           </p>
 
           <h1>
-            Diploma Course in Coir Technology
+            {application?.program?.title || "Application Form"}
           </h1>
         </div>
 

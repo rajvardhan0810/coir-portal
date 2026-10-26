@@ -8,10 +8,12 @@ import { getApiErrorMessage } from "@/lib/error";
 
 type Props = {
   applicationId: number;
+  programTitle?: string;
 };
 
 export function PreviewActions({
   applicationId,
+  programTitle,
 }: Props) {
   const router = useRouter();
 
@@ -175,8 +177,7 @@ export function PreviewActions({
             </p>
 
             <strong>
-              &quot;Diploma Course in Coir
-              Technology&quot;
+              &quot;{programTitle || "Application Form"}&quot;
             </strong>
 
             <button
@@ -223,8 +224,7 @@ export function PreviewActions({
             </p>
 
             <strong>
-              &quot;Diploma Course in Coir
-              Technology&quot;
+              &quot;{programTitle || "Application Form"}&quot;
             </strong>
 
             <button

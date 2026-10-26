@@ -83,11 +83,11 @@ export default function PreviewPage() {
       >
         <div className="application-page-header">
           <p>
-            APPLICATION FORM - FINAL PREVIEW
+            APPLICATION FORM - FINAL PREVIEW {application?.scheme?.name ? `• ${application.scheme.name}` : ""}
           </p>
 
           <h1>
-            Diploma Course in Coir Technology - Preview
+            {application?.program?.title ? `${application.program.title} - Preview` : "Application Preview"}
           </h1>
         </div>
 
@@ -111,10 +111,9 @@ export default function PreviewPage() {
           application={application}
         />
 
-        
-
         <PreviewActions
           applicationId={applicationId}
+          programTitle={application?.program?.title}
         />
       </ApplicationLayout>
     </ApplicationShell>

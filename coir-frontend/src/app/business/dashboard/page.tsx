@@ -109,7 +109,7 @@ function getSupplierInfo(user: UserProfile | null) {
   const emailPrefix = email ? email.split("@")[0] : "supplier";
   const formattedName = user?.fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) + " Supplier");
   const derivedId = `sup-${emailPrefix.replace(/[^a-z0-9]/gi, "")}`;
-  return { supplierId: derivedId || "sup-2", name: formattedName, email: email || "supplier@coirboard.gov.in" };
+  return { supplierId: derivedId || `sup-${user?.id || Date.now()}`, name: formattedName, email: email || "supplier@coirboard.gov.in" };
 }
 
 export default function BusinessDashboardPage() {

@@ -67,9 +67,16 @@ export default function ViewPage() {
 
       <div className="view-header">
 
-        <h1>
-          Application Details
-        </h1>
+        <div>
+          <h1>
+            Application Details
+          </h1>
+          {application.scheme && (
+            <p style={{ margin: "4px 0 0", color: "#6b4e28", fontWeight: 600 }}>
+              {application.scheme.name} {application.program?.title ? `— ${application.program.title}` : ""}
+            </p>
+          )}
+        </div>
 
         <div className="view-meta">
 
